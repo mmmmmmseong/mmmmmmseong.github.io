@@ -1,0 +1,68 @@
+@use '../abstracts/variables' as v;
+@use '../abstracts/mixins' as mx;
+@use '../abstracts/breakpoints' as bp;
+@use '../abstracts/placeholders';
+
+#topbar-wrapper {
+  height: v.$topbar-height;
+  background-color: var(--topbar-bg);
+
+  @include mx.slide(top 0.2s ease);
+
+  left: 0;
+}
+
+#topbar {
+  @extend %btn-color;
+
+  #breadcrumb {
+    font-size: 1rem;
+    color: var(--text-muted-color);
+    padding-left: 0.5rem;
+
+    a:hover {
+      @extend %link-hover;
+    }
+
+    span {
+      &:not(:last-child) {
+        &::after {
+          content: '›';
+          padding: 0 0.3rem;
+        }
+      }
+    }
+
+    display: none;
+  }
+
+  .nav-item {
+    font-size: 0.95rem;
+
+    a {
+      @extend %link-hover;
+    }
+  }
+
+  @include bp.between(bp.get(lg), calc(#{bp.get(xl)} - 1px)) {
+    .nav-item {
+      padding-right: 1rem;
+    }
+  }
+}
+
+#topbar-title {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: sans-serif;
+  color: var(--topbar-text-color);
+  text-align: center;
+  width: 70%;
+  word-break: keep-all;
+}
+
+#sidebar-trigger,
+#search-trigger {
+  display: block;
+}
