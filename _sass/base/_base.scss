@@ -1,0 +1,31 @@
+@use '../abstracts/variables' as v;
+@use '../abstracts/mixins' as mx;
+@use '../abstracts/breakpoints' as bp;
+
+#main-wrapper {
+  position: relative;
+
+  @include mx.pl-pr(0);
+
+  @include mx.slide;
+
+  > .container {
+    min-height: 100vh;
+
+    @include bp.lte(bp.get(md)) {
+      @include mx.max-w-100;
+      @include mx.pl-pr(0);
+    }
+
+    /* Pad horizontal */
+    @include bp.between(992px, calc(#{bp.get(xl)} - 1px)) {
+      .col-lg-11 {
+        @include mx.pl-pr(1rem);
+      }
+    }
+  }
+}
+
+#mask {
+  inset: 0 0 0 0;
+}
