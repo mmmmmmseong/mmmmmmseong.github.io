@@ -1,0 +1,48 @@
+---
+import type { Wiki } from '../lib/content';
+import { formatDate, urlOf, wikiCategory } from '../lib/content';
+import { STATUS_LABEL } from '../site.config';
+
+interface Props {
+  entries: Wiki[];
+}
+
+const { entries } = Astro.props;
+---
+
+<ul class="wiki-list">
+  {
+    entries.map((e) => (
+      <li>
+        <a href={urlOf(e)}>
+          <span class="title">{e.data.title}</span>
+          {e.data.description && <span class="desc">{e.data.description}</span>}
+        </a>
+        <span class="meta">
+          {wikiCategory(e) && <span>{wikiCategory(e)}</span>}
+          <span title="문서 상태">{STATUS_LABEL[e.data.status]}</span>
+          {e.data.updated && <time datetime={e.data.updated.toISOString()}>{formatDate(e.data.updated)}</time>}
+        </span>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .wiki-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 16px;
+    padding: 14px 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  a { display: flex; flex-direction: column; min-width: 0; color: var(--text); }
+  a:hover { text-decoration: none; }
+  a:hover .title { color: var(--accent); }
+  .title { font-weight: 600; }
+  .desc { color: var(--muted); font-size: 0.9rem; }
+  .meta { display: flex; gap: 12px; color: var(--muted); font-size: 0.84rem; white-space: nowrap; }
+</style>

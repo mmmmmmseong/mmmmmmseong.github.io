@@ -1,0 +1,71 @@
+---
+import type { Project } from '../lib/content';
+import { urlOf } from '../lib/content';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const { title, summary, period, stack, thumbnail, featured } = project.data;
+---
+
+<article class="card" data-tags={JSON.stringify([...stack, ...project.data.tags])}>
+  <a class="thumb" href={urlOf(project)} tabindex="-1" aria-hidden="true">
+    {thumbnail ? <img src={thumbnail} alt="" loading="lazy" /> : <span class="placeholder">{title.slice(0, 1)}</span>}
+  </a>
+  <div class="body">
+    <div class="meta">
+      {period && <span>{period}</span>}
+      {featured && <span class="badge">대표</span>}
+    </div>
+    <h3><a href={urlOf(project)}>{title}</a></h3>
+    {summary && <p>{summary}</p>}
+    {
+      stack.length > 0 && (
+        <ul class="tags">
+          {stack.map((s) => (
+            <li class="tag">{s}</li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .card:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); transform: translateY(-2px); }
+  .thumb {
+    display: block;
+    aspect-ratio: 16 / 9;
+    background: var(--accent-soft);
+    overflow: hidden;
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .placeholder {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    color: var(--accent);
+    font-size: 2.4rem;
+    font-weight: 800;
+    opacity: 0.55;
+  }
+  .body { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px 18px; flex: 1; }
+  .meta { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 0.84rem; }
+  h3 { margin: 0; font-size: 1.08rem; }
+  h3 a { color: var(--text); }
+  h3 a:hover { color: var(--accent); }
+  p { margin: 0; color: var(--muted); font-size: 0.94rem; line-height: 1.6; }
+  .tags { margin-top: auto; padding-top: 6px; }
+</style>

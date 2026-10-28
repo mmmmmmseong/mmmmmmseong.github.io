@@ -1,0 +1,77 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getProjects } from '../../lib/content';
+
+const projects = await getProjects();
+const counts = new Map<string, number>();
+for (const p of projects) for (const t of new Set([...p.data.stack, ...p.data.tags])) counts.set(t, (counts.get(t) ?? 0) + 1);
+const filters = [...counts].sort((a, b) => b[1] - a[1]).slice(0, 12).map(([t]) => t);
+---
+
+<Base title="프로젝트" description="만든 것들을 정리한 프로젝트 목록">
+  <h1>프로젝트</h1>
+  <p class="muted">만든 것들과 그 과정에서 배운 점을 정리합니다.</p>
+
+  {
+    filters.length > 1 && (
+      <div class="filters" role="group" aria-label="기술 스택으로 거르기">
+        <button type="button" class="filter" aria-pressed="true" data-filter="">
+          전체
+        </button>
+        {filters.map((t) => (
+          <button type="button" class="filter" aria-pressed="false" data-filter={t}>
+            {t}
+          </button>
+        ))}
+      </div>
+    )
+  }
+
+  {
+    projects.length ? (
+      <div class="grid">
+        {projects.map((p) => (
+          <ProjectCard project={p} />
+        ))}
+      </div>
+    ) : (
+      <p class="empty">아직 프로젝트가 없습니다. content/projects 폴더에 글을 추가해 보세요.</p>
+    )
+  }
+</Base>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.filter');
+  const cards = document.querySelectorAll<HTMLElement>('.grid > [data-tags]');
+  for (const btn of buttons) {
+    btn.addEventListener('click', () => {
+      const f = btn.dataset.filter ?? '';
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      cards.forEach((c) => {
+        const tags: string[] = JSON.parse(c.dataset.tags ?? '[]');
+        c.hidden = f !== '' && !tags.includes(f);
+      });
+    });
+  }
+</script>
+
+<style>
+  h1 { margin: 0 0 4px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 28px 0 24px; }
+  .filter {
+    padding: 5px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--muted);
+    font: inherit;
+    font-size: 0.88rem;
+    cursor: pointer;
+  }
+  .filter:hover { color: var(--accent); border-color: var(--accent); }
+  .filter[aria-pressed='true'] { background: var(--accent-fill); border-color: var(--accent-fill); color: var(--on-accent); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 28px; }
+  .filters + .grid { margin-top: 0; }
+  .grid > [hidden] { display: none; }
+</style>

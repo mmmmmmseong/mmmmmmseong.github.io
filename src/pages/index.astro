@@ -1,0 +1,52 @@
+---
+import Base from '../layouts/Base.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import WikiList from '../components/WikiList.astro';
+import { getProjects, getWiki } from '../lib/content';
+import { SITE } from '../site.config';
+
+const projects = await getProjects();
+const featured = (projects.some((p) => p.data.featured) ? projects.filter((p) => p.data.featured) : projects).slice(0, 3);
+const recentWiki = (await getWiki()).slice(0, 6);
+---
+
+<Base>
+  <section class="hero">
+    <p class="eyebrow">{SITE.description}</p>
+    <h1>{SITE.intro}</h1>
+    <div class="actions">
+      <a class="btn" href="/projects">프로젝트 보기</a>
+      <a class="btn ghost" href="/wiki">위키 둘러보기</a>
+    </div>
+  </section>
+
+  <div class="section-title">
+    <h2>대표 프로젝트</h2>
+    <a href="/projects">전체 보기 →</a>
+  </div>
+  {
+    featured.length ? (
+      <div class="grid">
+        {featured.map((p) => (
+          <ProjectCard project={p} />
+        ))}
+      </div>
+    ) : (
+      <p class="empty">아직 프로젝트가 없습니다.</p>
+    )
+  }
+
+  <div class="section-title">
+    <h2>최근 업데이트된 위키</h2>
+    <a href="/wiki">전체 보기 →</a>
+  </div>
+  {recentWiki.length ? <WikiList entries={recentWiki} /> : <p class="empty">아직 위키 문서가 없습니다.</p>}
+</Base>
+
+<style>
+  .hero { padding: 40px 0 8px; }
+  .eyebrow { margin: 0 0 10px; color: var(--accent); font-weight: 700; font-size: 0.95rem; }
+  h1 { margin: 0; max-width: 720px; font-size: clamp(1.8rem, 4.5vw, 2.6rem); line-height: 1.3; letter-spacing: -0.03em; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+</style>

@@ -1,0 +1,119 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Connections from '../../components/Connections.astro';
+import { connections, getProjects, getWiki, type Project } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((project) => ({ params: { id: project.id }, props: { project } }));
+}
+
+const { project } = Astro.props as { project: Project };
+const { Content } = await render(project);
+const { title, summary, period, role, stack, tags, github, demo, thumbnail } = project.data;
+const related = connections(project, [...(await getWiki()), ...(await getProjects())]);
+---
+
+<Base title={title} description={summary}>
+  <article>
+    <a class="back" href="/projects">← 프로젝트</a>
+    <header>
+      <h1>{title}</h1>
+      {summary && <p class="summary">{summary}</p>}
+      <dl class="facts">
+        {
+          period && (
+            <div>
+              <dt>기간</dt>
+              <dd>{period}</dd>
+            </div>
+          )
+        }
+        {
+          role && (
+            <div>
+              <dt>역할</dt>
+              <dd>{role}</dd>
+            </div>
+          )
+        }
+        {
+          stack.length > 0 && (
+            <div>
+              <dt>기술</dt>
+              <dd>
+                <ul class="tags">
+                  {stack.map((s) => (
+                    <li class="tag">{s}</li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          )
+        }
+      </dl>
+      {
+        (github || demo) && (
+          <div class="links">
+            {github && (
+              <a class="btn ghost" href={github}>
+                GitHub
+              </a>
+            )}
+            {demo && (
+              <a class="btn" href={demo}>
+                데모 보기
+              </a>
+            )}
+          </div>
+        )
+      }
+    </header>
+
+    {thumbnail && <img class="cover" src={thumbnail} alt="" />}
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    {
+      tags.length > 0 && (
+        <ul class="tags footer-tags">
+          {tags.map((t) => (
+            <li>
+              <a class="tag" href={`/tags/${t}`}>
+                #{t}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    <Connections items={related} />
+  </article>
+</Base>
+
+<style>
+  article { max-width: 780px; margin: 0 auto; }
+  .back { color: var(--muted); font-size: 0.9rem; }
+  header { margin: 16px 0 32px; }
+  h1 { margin: 0 0 8px; font-size: clamp(1.7rem, 4vw, 2.2rem); letter-spacing: -0.02em; }
+  .summary { margin: 0; color: var(--muted); font-size: 1.08rem; }
+  .facts {
+    display: grid;
+    gap: 10px;
+    margin: 24px 0 0;
+    padding: 16px 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .facts div { display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: baseline; }
+  dt { color: var(--muted); font-size: 0.88rem; }
+  dd { margin: 0; }
+  .links { display: flex; gap: 10px; margin-top: 20px; }
+  .cover { display: block; width: 100%; margin-bottom: 32px; border-radius: var(--radius); border: 1px solid var(--border); }
+  .footer-tags { margin-top: 40px; }
+</style>

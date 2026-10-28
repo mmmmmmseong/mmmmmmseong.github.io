@@ -1,0 +1,167 @@
+---
+import '../styles/global.css';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import { SITE, NAV } from '../site.config';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = SITE.description } = Astro.props;
+const pageTitle = title ? `${title} · ${SITE.title}` : `${SITE.title} — ${SITE.description}`;
+const path = Astro.url.pathname;
+const canonical = new URL(path, Astro.site);
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#2f4f73" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+    <!-- 화면이 그려지기 전에 테마를 정해서 깜빡임을 막는다. 저장된 선택 → 시스템 설정 순 -->
+    <script is:inline>
+      (() => {
+        let theme;
+        try {
+          theme = localStorage.getItem('theme');
+        } catch {}
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">본문으로 건너뛰기</a>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="/">{SITE.title}</a>
+        <nav aria-label="주 메뉴">
+          {
+            NAV.map((item) => (
+              <a href={item.href} aria-current={path.startsWith(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            ))
+          }
+        </nav>
+        <ThemeToggle />
+      </div>
+    </header>
+
+    <main id="main" class="container">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <span>© {new Date().getFullYear()} {SITE.title}</span>
+        <span class="footer-links">
+          {SITE.links.github && <a href={SITE.links.github}>GitHub</a>}
+          {SITE.links.email && <a href={`mailto:${SITE.links.email}`}>Email</a>}
+        </span>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .skip {
+    position: absolute;
+    left: -9999px;
+  }
+  .skip:focus {
+    left: 16px;
+    top: 12px;
+    z-index: 100;
+    padding: 6px 12px;
+    background: var(--surface);
+    border-radius: 6px;
+  }
+
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter: saturate(160%) blur(10px);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 60px;
+  }
+  .brand {
+    font-weight: 800;
+    font-size: 1.08rem;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .brand:hover { color: var(--accent); text-decoration: none; }
+  nav {
+    display: flex;
+    gap: 4px;
+    margin-left: auto;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav a {
+    padding: 6px 10px;
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: 0.95rem;
+    white-space: nowrap;
+  }
+  nav a:hover { color: var(--text); background: var(--surface-2); text-decoration: none; }
+  nav a[aria-current='page'] { color: var(--accent); font-weight: 600; }
+
+  main {
+    min-height: calc(100vh - 60px - 90px);
+    padding-top: 40px;
+    padding-bottom: 80px;
+  }
+
+  .site-footer {
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 90px;
+  }
+  .footer-links { display: flex; gap: 16px; }
+  .footer-links a { color: var(--muted); }
+  .footer-links a:hover { color: var(--accent); }
+
+  .brand { white-space: nowrap; }
+  .site-header :global(.theme-toggle) { flex-shrink: 0; }
+
+  /* 좁은 화면: 이름 + 테마 버튼 한 줄, 메뉴는 아래 줄 */
+  @media (max-width: 560px) {
+    .header-inner { flex-wrap: wrap; justify-content: space-between; gap: 0; height: auto; padding-top: 10px; }
+    nav { order: 3; width: 100%; margin: 6px -8px 4px; }
+    nav a { padding: 6px 8px; }
+    main { padding-top: 28px; }
+  }
+</style>

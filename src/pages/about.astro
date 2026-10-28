@@ -1,0 +1,28 @@
+---
+import { getEntry, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { SITE } from '../site.config';
+
+// 내용은 content/pages/about.md 에서 고친다.
+const about = await getEntry('pages', 'about');
+const rendered = about ? await render(about) : undefined;
+---
+
+<Base title={about?.data.title ?? '소개'} description={about?.data.description}>
+  <article>
+    <h1>{about?.data.title ?? '소개'}</h1>
+    <div class="prose">
+      {rendered ? <rendered.Content /> : <p class="empty">content/pages/about.md 파일을 만들어 소개를 적어주세요.</p>}
+    </div>
+    <div class="links">
+      {SITE.links.github && <a class="btn ghost" href={SITE.links.github}>GitHub</a>}
+      {SITE.links.email && <a class="btn ghost" href={`mailto:${SITE.links.email}`}>Email</a>}
+    </div>
+  </article>
+</Base>
+
+<style>
+  article { max-width: 720px; margin: 0 auto; }
+  h1 { margin: 0 0 24px; }
+  .links { display: flex; gap: 10px; margin-top: 40px; }
+</style>

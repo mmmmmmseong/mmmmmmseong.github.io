@@ -1,0 +1,11 @@
+{
+  "attachmentFolderPath": "attachments",
+  "newFileLocation": "folder",
+  "newFileFolderPath": "wiki",
+  "newLinkFormat": "shortest",
+  "useMarkdownLinks": false,
+  "alwaysUpdateLinks": true,
+  "showFrontmatter": true,
+  "livePreview": true,
+  "userIgnoreFilters": ["_templates/"]
+}

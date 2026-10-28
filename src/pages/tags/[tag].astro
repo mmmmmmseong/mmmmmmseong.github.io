@@ -1,0 +1,50 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getTagMap, urlOf, type Project, type Wiki } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const tags = await getTagMap();
+  return [...tags].map(([tag, items]) => ({ params: { tag }, props: { items } }));
+}
+
+const { tag } = Astro.params;
+const { items } = Astro.props as { items: (Wiki | Project)[] };
+const projects = items.filter((e) => e.collection === 'projects');
+const wiki = items.filter((e) => e.collection === 'wiki');
+const groups = [
+  { label: '프로젝트', list: projects },
+  { label: '위키', list: wiki },
+].filter((g) => g.list.length);
+---
+
+<Base title={`#${tag}`} description={`'${tag}' 태그가 붙은 문서`}>
+  <a class="back" href="/tags">← 태그</a>
+  <h1>#{tag}</h1>
+  <p class="muted">문서 {items.length}개</p>
+  {
+    groups.map((g) => (
+      <section>
+        <h2>{g.label}</h2>
+        <ul>
+          {g.list.map((e) => (
+            <li>
+              <a href={urlOf(e)}>{e.data.title}</a>
+              {'summary' in e.data && e.data.summary && <span class="muted"> — {e.data.summary}</span>}
+              {'description' in e.data && e.data.description && <span class="muted"> — {e.data.description}</span>}
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</Base>
+
+<style>
+  .back { color: var(--muted); font-size: 0.9rem; }
+  h1 { margin: 12px 0 4px; }
+  section { margin-top: 36px; }
+  h2 { margin: 0 0 10px; color: var(--muted); font-size: 0.9rem; }
+  ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
+  li { padding: 12px 4px; border-bottom: 1px solid var(--border); }
+  li a { font-weight: 600; }
+</style>

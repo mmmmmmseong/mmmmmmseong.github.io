@@ -1,0 +1,61 @@
+---
+// 위키 ↔ 프로젝트 사이의 연결(이 문서가 링크한 문서 + 이 문서를 링크한 문서)
+import type { Project, Wiki } from '../lib/content';
+import { urlOf } from '../lib/content';
+
+interface Props {
+  items: (Wiki | Project)[];
+}
+
+const { items } = Astro.props;
+const label = { wiki: '위키', projects: '프로젝트' };
+---
+
+{
+  items.length > 0 && (
+    <section class="connections">
+      <h2>연결된 문서</h2>
+      <ul>
+        {items.map((e) => (
+          <li>
+            <a href={urlOf(e)}>
+              <span class="kind">{label[e.collection]}</span>
+              {e.data.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  .connections {
+    margin-top: 56px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  h2 { margin: 0 0 12px; font-size: 1rem; }
+  ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: var(--surface-2);
+    color: var(--text);
+    font-size: 0.93rem;
+  }
+  a:hover { color: var(--accent); text-decoration: none; }
+  .kind { color: var(--accent); font-size: 0.75rem; font-weight: 700; }
+</style>

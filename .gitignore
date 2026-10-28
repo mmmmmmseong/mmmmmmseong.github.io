@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+
+# Obsidian: 개인 작업 상태는 커밋하지 않음
+content/.obsidian/workspace*.json
+content/.obsidian/cache
+content/.obsidian/plugins/
+content/.trash/

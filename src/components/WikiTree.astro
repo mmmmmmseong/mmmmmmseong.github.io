@@ -1,0 +1,69 @@
+---
+import type { TreeNode } from '../lib/content';
+import { countEntries, urlOf } from '../lib/content';
+
+interface Props {
+  node: TreeNode;
+  current?: string; // 현재 보고 있는 문서 URL
+}
+
+const { node, current } = Astro.props;
+---
+
+<ul class="tree">
+  {
+    node.children.map((child) => (
+      <li>
+        <details open={!current || current.startsWith(`/wiki/${child.path}/`) || undefined}>
+          <summary>
+            {child.name}
+            <span class="count">{countEntries(child)}</span>
+          </summary>
+          <Astro.self node={child} current={current} />
+        </details>
+      </li>
+    ))
+  }
+  {
+    node.entries.map((e) => (
+      <li>
+        <a href={urlOf(e)} aria-current={urlOf(e) === current ? 'page' : undefined}>
+          {e.data.title}
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .tree { margin: 0; padding: 0; list-style: none; font-size: 0.93rem; }
+  .tree .tree { margin-left: 10px; padding-left: 10px; border-left: 1px solid var(--border); }
+  summary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before {
+    content: '▸';
+    color: var(--muted);
+    font-size: 0.8em;
+    transition: transform 0.15s ease;
+  }
+  details[open] > summary::before { transform: rotate(90deg); }
+  summary:hover { background: var(--surface-2); }
+  .count { margin-left: auto; color: var(--muted); font-size: 0.78rem; font-weight: 400; }
+  a {
+    display: block;
+    padding: 4px 6px;
+    border-radius: 6px;
+    color: var(--muted);
+  }
+  a:hover { color: var(--text); background: var(--surface-2); text-decoration: none; }
+  a[aria-current='page'] { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+</style>
