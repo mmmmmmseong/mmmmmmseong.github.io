@@ -4,13 +4,15 @@ import { z } from 'astro/zod';
 import { parse as parseYaml } from 'yaml';
 import { vaultLoader } from './lib/vault';
 
+// YAML 은 따옴표 없는 2026.10 같은 값을 숫자로 읽는다. 글이 통째로 빠지지 않도록 숫자도 글자로 받는다.
+const text = z.union([z.string(), z.number()]).transform(String);
 // Obsidian 속성(Properties)은 비어 있으면 null 이 되므로 빈 배열로 맞춘다.
 const list = z
-  .union([z.array(z.string()), z.string()])
+  .union([z.array(text), text])
   .nullish()
   .transform((v) => (v == null ? [] : Array.isArray(v) ? v : [v]));
 const optionalDate = z.coerce.date().nullish().transform((v) => v ?? undefined);
-const optionalText = z.string().nullish().transform((v) => v || undefined);
+const optionalText = text.nullish().transform((v) => v || undefined);
 
 const wiki = defineCollection({
   loader: vaultLoader('wiki'),

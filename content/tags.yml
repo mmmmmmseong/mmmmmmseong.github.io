@@ -11,3 +11,21 @@ tags:
   - id: 도구
     name: 도구
     description: 개발 도구와 설정
+  - id: 보안
+    name: 보안
+    description: 웹·AI 보안, 취약점 실습
+  - id: ai
+    name: AI
+    description: LLM과 AI 서비스
+  - id: 웹
+    name: 웹
+    description: 웹 서비스 개발
+  - id: 앱
+    name: 앱
+    description: 모바일·크로스플랫폼 앱
+  - id: 게임
+    name: 게임
+    description: 게임과 모드 개발
+  - id: 학교
+    name: 학교
+    description: 학교 생활에 쓰려고 만든 것들
