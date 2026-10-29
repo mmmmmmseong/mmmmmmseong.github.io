@@ -32,7 +32,7 @@ const recentWiki = (await getWiki()).slice(0, 6);
         ))}
       </div>
     ) : (
-      <p class="empty">아직 프로젝트가 없습니다.</p>
+      <p class="empty">아직 프로젝트가 없다.</p>
     )
   }
 
@@ -40,7 +40,7 @@ const recentWiki = (await getWiki()).slice(0, 6);
     <h2>최근 업데이트된 위키</h2>
     <a href="/wiki">전체 보기 →</a>
   </div>
-  {recentWiki.length ? <WikiList entries={recentWiki} /> : <p class="empty">아직 위키 문서가 없습니다.</p>}
+  {recentWiki.length ? <WikiList entries={recentWiki} /> : <p class="empty">아직 위키 문서가 없다.</p>}
 </Base>
 
 <style>

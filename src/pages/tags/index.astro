@@ -8,7 +8,7 @@ const tagInfo = await getTagInfo();
 
 <Base title="태그" description="위키와 프로젝트의 태그 모음">
   <h1>태그</h1>
-  <p class="muted">위키와 프로젝트를 태그로 모아봅니다.</p>
+  <p class="muted">위키와 프로젝트를 태그로 모아본다.</p>
   {
     tags.size ? (
       <ul class="tags cloud">
@@ -21,7 +21,7 @@ const tagInfo = await getTagInfo();
         ))}
       </ul>
     ) : (
-      <p class="empty">아직 태그가 없습니다.</p>
+      <p class="empty">아직 태그가 없다.</p>
     )
   }
 </Base>

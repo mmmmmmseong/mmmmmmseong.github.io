@@ -10,7 +10,7 @@ updated: 2026-10-29
 
 ## 왜 쓰나
 
-라우트가 많아지면 `app.py` 하나에 다 넣기 어렵습니다. **블루프린트(Blueprint)**는 라우트 묶음을 따로 만들어 두었다가 앱에 등록하는 방법입니다.
+라우트가 많아지면 `app.py` 하나에 다 넣기 어렵다. **블루프린트(Blueprint)**는 라우트 묶음을 따로 만들어 두었다가 앱에 등록하는 방법이다.
 
 ## 기본 사용법
 
@@ -34,8 +34,8 @@ app = Flask(__name__)
 app.register_blueprint(pages_bp)
 ```
 
-- `Blueprint('pages', __name__)`의 첫 인자가 이름입니다. `url_for('pages.landing')`처럼 **"블루프린트 이름.함수 이름"**으로 주소를 만듭니다.
-- `url_prefix='/oss'`를 주면 그 블루프린트의 모든 주소 앞에 붙습니다.
+- `Blueprint('pages', __name__)`의 첫 인자가 이름이다. `url_for('pages.landing')`처럼 **"블루프린트 이름.함수 이름"**으로 주소를 만든다.
+- `url_prefix='/oss'`를 주면 그 블루프린트의 모든 주소 앞에 붙는다.
 
 ## Break The AI의 구조
 
@@ -54,7 +54,7 @@ routes/
 
 ### 문제가 스스로 등록하는 패턴
 
-`stages/__init__.py`에 빈 사전을 만들고, 각 문제 파일이 import될 때 자기 정보를 채워 넣습니다.
+`stages/__init__.py`에 빈 사전을 만들고, 각 문제 파일이 import될 때 자기 정보를 채워 넣는다.
 
 ```python
 # stages/__init__.py
@@ -76,7 +76,7 @@ TITLES[STAGE] = '하 - 비밀번호 확보'
 def easy_flag(): ...
 ```
 
-새 문제를 추가할 때 **파일 하나를 만들고 import 한 줄만** 더하면, 메뉴·랭킹·채팅이 모두 자동으로 알게 됩니다.
+새 문제를 추가할 때 **파일 하나를 만들고 import 한 줄만** 더하면, 메뉴·랭킹·채팅이 모두 자동으로 알게 된다.
 
 ### 모든 템플릿에 공용 값 넣기
 
@@ -86,9 +86,9 @@ def inject_stages():
     return {'TITLES': TITLES, 'STAGE_ORDER': STAGE_ORDER}
 ```
 
-이렇게 하면 모든 템플릿에서 `{{ TITLES['easy_flag'] }}`처럼 바로 쓸 수 있습니다.
+이렇게 하면 모든 템플릿에서 `{{ TITLES['easy_flag'] }}`처럼 바로 쓸 수 있다.
 
 ## 주의할 점
 
-- **순환 import:** 블루프린트 객체나 공용 사전을 정의하기 전에 하위 모듈을 import하면 오류가 납니다. 정의 → import 순서를 지킵니다.
-- **환경변수를 읽는 모듈:** import될 때 환경변수를 읽는 모듈이 있으면, 그보다 먼저 `load_dotenv()`를 호출해야 합니다. ([[env로-api-키-관리]])
+- **순환 import:** 블루프린트 객체나 공용 사전을 정의하기 전에 하위 모듈을 import하면 오류가 난다. 정의 → import 순서를 지킨다.
+- **환경변수를 읽는 모듈:** import될 때 환경변수를 읽는 모듈이 있으면, 그보다 먼저 `load_dotenv()`를 호출해야 한다. ([[env로-api-키-관리]])

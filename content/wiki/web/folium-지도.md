@@ -8,7 +8,7 @@ updated: 2026-10-29
 
 > 관련 프로젝트: [[map|학교 등산 행사 지도]] · [GitHub](https://github.com/mmmmmmseong/map)
 
-**Folium**은 파이썬으로 Leaflet.js 지도를 만드는 라이브러리입니다. 결과물은 HTML이라 웹페이지나 Streamlit에 그대로 넣을 수 있습니다.
+**Folium**은 파이썬으로 Leaflet.js 지도를 만드는 라이브러리다. 결과물은 HTML이라 웹페이지나 Streamlit에 그대로 넣을 수 있다.
 
 ## 지도 만들기
 
@@ -20,7 +20,7 @@ m = folium.Map(location=[37.407576, 126.719651], zoom_start=15, tiles="OpenStree
 
 - `location`: 처음 보여줄 중심 좌표 `[위도, 경도]`
 - `zoom_start`: 확대 정도 (클수록 가까이)
-- `tiles`: 지도 배경. 바꿔 끼울 수 있습니다.
+- `tiles`: 지도 배경. 바꿔 끼울 수 있다.
 
 ## 마커와 팝업
 
@@ -48,11 +48,11 @@ folium.Marker(
 ).add_to(m)
 ```
 
-- `popup`: 클릭하면 뜨는 창. HTML을 넣을 수 있어서, 등산 지도에서는 지점 사진을 보여줍니다.
+- `popup`: 클릭하면 뜨는 창. HTML을 넣을 수 있어서, 등산 지도에서는 지점 사진을 보여준다.
 - `tooltip`: 마우스를 올리면 뜨는 짧은 글
-- `icon`: 색과 모양. 등산 지도는 코스마다 색(A 빨강, B 파랑, …)을 정했습니다.
+- `icon`: 색과 모양. 등산 지도는 코스마다 색(A 빨강, B 파랑, …)을 정했다.
 
-> 팝업 HTML에 글자를 넣을 때는 `html.escape()`로 감쌉니다. 그대로 넣으면 그 값에 들어 있는 스크립트가 실행될 수 있습니다(XSS). 등산 지도도 지점 이름을 이렇게 감싸서 넣습니다.
+> 팝업 HTML에 글자를 넣을 때는 `html.escape()`로 감싼다. 그대로 넣으면 그 값에 들어 있는 스크립트가 실행될 수 있다(XSS). 등산 지도도 지점 이름을 이렇게 감싸서 넣는다.
 
 ## 경로선
 
@@ -63,7 +63,7 @@ folium.PolyLine(course_points, color="red", weight=2.5, opacity=1).add_to(m)
 
 ## 데이터는 CSV로
 
-지점 정보를 코드에 쓰지 않고 `PathMap.csv` 하나에 모았습니다.
+지점 정보를 코드에 쓰지 않고 `PathMap.csv` 하나에 모았다.
 
 ```text
 연번,코스,위치명,위도,경도,소요시간,이미지
@@ -75,8 +75,8 @@ path = pd.read_csv("PathMap.csv", encoding="utf-8-sig")
 course_points = path[path["코스"] == "A"][["위도", "경도"]].values.tolist()
 ```
 
-- 엑셀에서 저장한 CSV는 맨 앞에 BOM이 붙어 첫 열 이름이 `﻿연번`이 될 수 있습니다. `encoding="utf-8-sig"`로 읽으면 해결됩니다. ([[문자-인코딩-utf8-cp949]])
-- 위치 이름에 쉼표가 있으면 그 칸을 따옴표로 감싸야 합니다.
+- 엑셀에서 저장한 CSV는 맨 앞에 BOM이 붙어 첫 열 이름이 `﻿연번`이 될 수 있다. `encoding="utf-8-sig"`로 읽으면 해결된다. ([[문자-인코딩-utf8-cp949]])
+- 위치 이름에 쉼표가 있으면 그 칸을 따옴표로 감싸야 한다.
 
 ## Streamlit에 띄우기
 
@@ -86,4 +86,4 @@ from streamlit_folium import st_folium
 st_folium(m, use_container_width=True, height=400)
 ```
 
-Streamlit은 위젯을 조작할 때마다 지도를 다시 그립니다. ([[streamlit-재실행-모델]])
+Streamlit은 위젯을 조작할 때마다 지도를 다시 그린다. ([[streamlit-재실행-모델]])

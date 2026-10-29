@@ -29,11 +29,11 @@ Fantasy Economy에서 검증한 조합:
 | Gradle | 9.7.1 |
 | Java | 25 |
 
-버전은 `gradle.properties`에 모아두고, 공식 템플릿(`FabricMC/fabric-example-mod`의 해당 버전 브랜치)과 `meta.fabricmc.net`에서 맞는 값을 확인합니다.
+버전은 `gradle.properties`에 모아두고, 공식 템플릿(`FabricMC/fabric-example-mod`의 해당 버전 브랜치)과 `meta.fabricmc.net`에서 맞는 값을 확인한다.
 
 ## 시스템 Java를 건드리지 않고 JDK 쓰기
 
-PC에 다른 버전의 Java가 깔려 있어도, JDK 25를 따로 받아 두고 **빌드할 때만** 지정할 수 있습니다.
+PC에 다른 버전의 Java가 깔려 있어도, JDK 25를 따로 받아 두고 **빌드할 때만** 지정할 수 있다.
 
 ```powershell
 # PowerShell
@@ -59,14 +59,14 @@ export JAVA_HOME=~/.jdks/jdk-25
 
 ## 설치
 
-- 빌드한 jar와 같은 버전용 Fabric API를 `.minecraft/mods`에 넣습니다.
-- **새 아이템·블록을 등록하는 모드는 서버와 클라이언트 모두에** 설치해야 합니다.
+- 빌드한 jar와 같은 버전용 Fabric API를 `.minecraft/mods`에 넣는다.
+- **새 아이템·블록을 등록하는 모드는 서버와 클라이언트 모두에** 설치해야 한다.
 
 ## 테스트 습관
 
-- 게임 로직(가격 계산 등)은 Minecraft에 의존하지 않는 클래스로 빼서 **JUnit으로 빠르게** 테스트합니다.
-- 실제 게임과 맞물리는 부분은 **Fabric GameTest**로 서버를 띄워 확인합니다.
-- 설정 파일의 잘못된 값도 테스트에서 잡게 하면, 빌드가 실패해서 실수를 바로 알 수 있습니다.
+- 게임 로직(가격 계산 등)은 Minecraft에 의존하지 않는 클래스로 빼서 **JUnit으로 빠르게** 테스트한다.
+- 실제 게임과 맞물리는 부분은 **Fabric GameTest**로 서버를 띄워 확인한다.
+- 설정 파일의 잘못된 값도 테스트에서 잡게 하면, 빌드가 실패해서 실수를 바로 알 수 있다.
 
 ## 관련 문서
 

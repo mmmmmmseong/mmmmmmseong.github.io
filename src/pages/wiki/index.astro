@@ -10,7 +10,7 @@ const tree = buildTree(entries);
 
 <Base title="위키" description="공부하고 정리한 내용을 모아둔 개인 위키">
   <h1>위키</h1>
-  <p class="muted">공부하고 정리한 내용을 주제별로 모아둡니다. 문서 {entries.length}개</p>
+  <p class="muted">공부하고 정리한 내용을 주제별로 모아둔다. 문서 {entries.length}개</p>
 
   {
     entries.length ? (
@@ -25,7 +25,7 @@ const tree = buildTree(entries);
         </section>
       </div>
     ) : (
-      <p class="empty">아직 위키 문서가 없습니다. content/wiki 폴더에 글을 추가해 보세요.</p>
+      <p class="empty">아직 위키 문서가 없다. content/wiki 폴더에 글을 추가하면 여기에 나온다.</p>
     )
   }
 </Base>

@@ -12,7 +12,7 @@ const rendered = about ? await render(about) : undefined;
   <article>
     <h1>{about?.data.title ?? '소개'}</h1>
     <div class="prose">
-      {rendered ? <rendered.Content /> : <p class="empty">content/pages/about.md 파일을 만들어 소개를 적어주세요.</p>}
+      {rendered ? <rendered.Content /> : <p class="empty">content/pages/about.md 파일을 만들어 소개를 적으면 여기에 나온다.</p>}
     </div>
     <div class="links">
       {SITE.links.github && <a class="btn ghost" href={SITE.links.github}>GitHub</a>}
