@@ -46,6 +46,12 @@ const canonical = new URL(path, Astro.site);
         document.documentElement.dataset.theme = theme;
       })();
     </script>
+    <!-- 예전 사이트가 남긴 서비스 워커가 있으면 해제한다 (옛 페이지가 대신 뜨는 문제 방지, public/sw.js 참고) -->
+    <script is:inline>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((reg) => reg.unregister())).catch(() => {});
+      }
+    </script>
   </head>
   <body>
     <a class="skip" href="#main">본문으로 건너뛰기</a>
