@@ -1,8 +1,9 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { getTagMap } from '../../lib/content';
+import { getTagInfo, getTagMap } from '../../lib/content';
 
 const tags = await getTagMap();
+const tagInfo = await getTagInfo();
 ---
 
 <Base title="태그" description="위키와 프로젝트의 태그 모음">
@@ -13,8 +14,8 @@ const tags = await getTagMap();
       <ul class="tags cloud">
         {[...tags].map(([tag, items]) => (
           <li>
-            <a class="tag" href={`/tags/${tag}`}>
-              #{tag} <span>{items.length}</span>
+            <a class="tag" href={`/tags/${tag}`} title={tagInfo(tag).description}>
+              #{tagInfo(tag).name} <span>{items.length}</span>
             </a>
           </li>
         ))}

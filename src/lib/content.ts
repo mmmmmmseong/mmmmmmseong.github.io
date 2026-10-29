@@ -89,6 +89,21 @@ export function countEntries(n: TreeNode): number {
   return n.entries.length + n.children.reduce((s, c) => s + countEntries(c), 0);
 }
 
+export interface TagInfo {
+  id: string;
+  name: string;
+  description?: string;
+}
+
+/** content/tags.yml 의 태그 정보. 목록에 없는 태그는 id 를 그대로 이름으로 쓴다. */
+export async function getTagInfo(): Promise<(id: string) => TagInfo> {
+  const map = new Map((await getCollection('tags')).map((t) => [t.id, t.data]));
+  return (id) => {
+    const t = map.get(id);
+    return { id, name: t?.name ?? id, description: t?.description };
+  };
+}
+
 /** 위키 + 프로젝트 전체의 태그 → 문서 목록 */
 export async function getTagMap(): Promise<Map<string, Note[]>> {
   const map = new Map<string, Note[]>();

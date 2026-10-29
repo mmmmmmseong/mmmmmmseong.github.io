@@ -1,6 +1,6 @@
 ---
 import type { Project } from '../lib/content';
-import { urlOf } from '../lib/content';
+import { getTagInfo, urlOf } from '../lib/content';
 
 interface Props {
   project: Project;
@@ -8,9 +8,12 @@ interface Props {
 
 const { project } = Astro.props;
 const { title, summary, period, stack, thumbnail, featured } = project.data;
+const tagInfo = await getTagInfo();
+// 프로젝트 목록의 필터 버튼과 같은 이름을 쓴다.
+const filterKeys = [...stack, ...project.data.tags.map((t) => tagInfo(t).name)];
 ---
 
-<article class="card" data-tags={JSON.stringify([...stack, ...project.data.tags])}>
+<article class="card" data-tags={JSON.stringify(filterKeys)}>
   <a class="thumb" href={urlOf(project)} tabindex="-1" aria-hidden="true">
     {thumbnail ? <img src={thumbnail} alt="" loading="lazy" /> : <span class="placeholder">{title.slice(0, 1)}</span>}
   </a>

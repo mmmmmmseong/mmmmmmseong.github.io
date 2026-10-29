@@ -1,11 +1,12 @@
 ---
 import Base from '../../layouts/Base.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
-import { getProjects } from '../../lib/content';
+import { getProjects, getTagInfo } from '../../lib/content';
 
 const projects = await getProjects();
 const counts = new Map<string, number>();
-for (const p of projects) for (const t of new Set([...p.data.stack, ...p.data.tags])) counts.set(t, (counts.get(t) ?? 0) + 1);
+const tagInfo = await getTagInfo();
+for (const p of projects) for (const t of new Set([...p.data.stack, ...p.data.tags.map((id) => tagInfo(id).name)])) counts.set(t, (counts.get(t) ?? 0) + 1);
 const filters = [...counts].sort((a, b) => b[1] - a[1]).slice(0, 12).map(([t]) => t);
 ---
 

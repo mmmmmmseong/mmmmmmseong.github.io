@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { getTagMap, urlOf, type Project, type Wiki } from '../../lib/content';
+import { getTagInfo, getTagMap, urlOf, type Project, type Wiki } from '../../lib/content';
 
 export async function getStaticPaths() {
   const tags = await getTagMap();
@@ -8,6 +8,7 @@ export async function getStaticPaths() {
 }
 
 const { tag } = Astro.params;
+const info = (await getTagInfo())(tag!);
 const { items } = Astro.props as { items: (Wiki | Project)[] };
 const projects = items.filter((e) => e.collection === 'projects');
 const wiki = items.filter((e) => e.collection === 'wiki');
@@ -17,10 +18,10 @@ const groups = [
 ].filter((g) => g.list.length);
 ---
 
-<Base title={`#${tag}`} description={`'${tag}' 태그가 붙은 문서`}>
+<Base title={`#${info.name}`} description={info.description ?? `'${info.name}' 태그가 붙은 문서`}>
   <a class="back" href="/tags">← 태그</a>
-  <h1>#{tag}</h1>
-  <p class="muted">문서 {items.length}개</p>
+  <h1>#{info.name}</h1>
+  <p class="muted">{info.description && <>{info.description} · </>}문서 {items.length}개</p>
   {
     groups.map((g) => (
       <section>

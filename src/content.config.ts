@@ -1,5 +1,7 @@
 import { defineCollection } from 'astro:content';
+import { file } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { parse as parseYaml } from 'yaml';
 import { vaultLoader } from './lib/vault';
 
 // Obsidian 속성(Properties)은 비어 있으면 null 이 되므로 빈 배열로 맞춘다.
@@ -51,4 +53,19 @@ const pages = defineCollection({
   }),
 });
 
-export const collections = { wiki, projects, pages };
+// 태그 목록 (content/tags.yml). /admin 의 "태그 관리"에서 한 번에 관리한다.
+const tags = defineCollection({
+  loader: file('content/tags.yml', {
+    parser: (text) => {
+      const list = (parseYaml(text) as { tags?: unknown[] } | null)?.tags ?? [];
+      return list.filter((t): t is { id: unknown } => !!t && typeof t === 'object' && 'id' in t && !!t.id)
+        .map((t) => ({ ...t, id: String(t.id) }));
+    },
+  }),
+  schema: z.object({
+    name: optionalText,
+    description: optionalText,
+  }),
+});
+
+export const collections = { wiki, projects, pages, tags };

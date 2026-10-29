@@ -34,7 +34,18 @@ collections:
     fields:
       - { name: title, label: 제목, widget: string }
       - { name: description, label: 한 줄 설명, widget: string, required: false }
-      - { name: tags, label: 태그, widget: list, required: false, default: [] }
+      - name: tags
+        label: 태그
+        hint: "목록에 없는 태그는 왼쪽 메뉴의 '태그 관리'에서 먼저 추가하세요."
+        widget: relation
+        collection: taxonomy
+        file: tags
+        value_field: tags.*.id
+        display_fields: [tags.*.name]
+        search_fields: [tags.*.name, tags.*.id]
+        multiple: true
+        required: false
+        default: []
       - { name: created, label: 작성일, widget: datetime, type: date, format: YYYY-MM-DD, default: "{{now}}", required: false }
       - { name: updated, label: 수정일, widget: datetime, type: date, format: YYYY-MM-DD, auto_now: true, required: false }
       - { name: draft, label: "비공개 (초안)", widget: boolean, default: false, required: false }
@@ -54,7 +65,18 @@ collections:
       - { name: period, label: 기간, widget: string, required: false, hint: "예: 2025.03 – 2025.06" }
       - { name: role, label: 역할, widget: string, required: false, hint: "예: 백엔드 (팀 4명)" }
       - { name: stack, label: 기술 스택, widget: list, required: false, default: [] }
-      - { name: tags, label: 태그, widget: list, required: false, default: [] }
+      - name: tags
+        label: 태그
+        hint: "목록에 없는 태그는 왼쪽 메뉴의 '태그 관리'에서 먼저 추가하세요."
+        widget: relation
+        collection: taxonomy
+        file: tags
+        value_field: tags.*.id
+        display_fields: [tags.*.name]
+        search_fields: [tags.*.name, tags.*.id]
+        multiple: true
+        required: false
+        default: []
       - { name: github, label: GitHub 주소, widget: string, required: false }
       - { name: demo, label: 데모 주소, widget: string, required: false }
       - { name: thumbnail, label: 대표 이미지, widget: image, required: false }
@@ -63,6 +85,27 @@ collections:
       - { name: updated, label: 수정일, widget: datetime, type: date, format: YYYY-MM-DD, auto_now: true, required: false }
       - { name: draft, label: "비공개 (초안)", widget: boolean, default: false, required: false }
       - { name: body, label: 본문, widget: markdown }
+
+  - name: taxonomy
+    label: 태그 관리
+    files:
+      - name: tags
+        label: 태그 목록
+        file: content/tags.yml
+        fields:
+          - name: tags
+            label: 태그
+            label_singular: 태그
+            widget: list
+            summary: "{{fields.name}} ({{fields.id}})"
+            fields:
+              - name: id
+                label: ID
+                widget: string
+                hint: "글에 저장되고 주소(/tags/ID)에 쓰이는 값입니다. 한 번 정하면 바꾸지 마세요."
+                pattern: ['^[^\s/#?%]+$', "공백과 / # ? % 없이 입력하세요."]
+              - { name: name, label: 표시 이름, widget: string, hint: "사이트에 보이는 이름. 바꾸면 모든 글에 반영됩니다." }
+              - { name: description, label: 설명, widget: string, required: false }
 
   - name: pages
     label: 페이지

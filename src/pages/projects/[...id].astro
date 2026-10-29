@@ -2,7 +2,7 @@
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Connections from '../../components/Connections.astro';
-import { connections, getProjects, getWiki, type Project } from '../../lib/content';
+import { connections, getProjects, getTagInfo, getWiki, type Project } from '../../lib/content';
 
 export async function getStaticPaths() {
   const projects = await getProjects();
@@ -13,6 +13,7 @@ const { project } = Astro.props as { project: Project };
 const { Content } = await render(project);
 const { title, summary, period, role, stack, tags, github, demo, thumbnail } = project.data;
 const related = connections(project, [...(await getWiki()), ...(await getProjects())]);
+const tagInfo = await getTagInfo();
 ---
 
 <Base title={title} description={summary}>
@@ -80,10 +81,10 @@ const related = connections(project, [...(await getWiki()), ...(await getProject
     {
       tags.length > 0 && (
         <ul class="tags footer-tags">
-          {tags.map((t) => (
+          {tags.map(tagInfo).map((t) => (
             <li>
-              <a class="tag" href={`/tags/${t}`}>
-                #{t}
+              <a class="tag" href={`/tags/${t.id}`}>
+                #{t.name}
               </a>
             </li>
           ))}
