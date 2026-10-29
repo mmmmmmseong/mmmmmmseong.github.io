@@ -16,9 +16,3 @@ export const NAV = [
   { href: '/tags', label: '태그' },
   { href: '/about', label: '소개' },
 ];
-
-export const STATUS_LABEL = {
-  seed: '🌱 씨앗',
-  growing: '🌿 자라는 중',
-  evergreen: '🌳 완성',
-} as const;

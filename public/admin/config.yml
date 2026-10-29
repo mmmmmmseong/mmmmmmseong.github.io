@@ -29,20 +29,12 @@ collections:
     nested: { depth: 5 }
     meta: { path: { label: 분류 폴더 } }
     summary: "{{title}}"
-    sortable_fields: [title, updated, status]
+    sortable_fields: [title, updated]
     preview_path: "wiki/{{dirname}}/{{slug}}"
     fields:
       - { name: title, label: 제목, widget: string }
       - { name: description, label: 한 줄 설명, widget: string, required: false }
       - { name: tags, label: 태그, widget: list, required: false, default: [] }
-      - name: status
-        label: 문서 상태
-        widget: select
-        default: seed
-        options:
-          - { label: "🌱 씨앗 (메모 수준)", value: seed }
-          - { label: "🌿 자라는 중", value: growing }
-          - { label: "🌳 완성", value: evergreen }
       - { name: created, label: 작성일, widget: datetime, type: date, format: YYYY-MM-DD, default: "{{now}}", required: false }
       - { name: updated, label: 수정일, widget: datetime, type: date, format: YYYY-MM-DD, auto_now: true, required: false }
       - { name: draft, label: "비공개 (초안)", widget: boolean, default: false, required: false }

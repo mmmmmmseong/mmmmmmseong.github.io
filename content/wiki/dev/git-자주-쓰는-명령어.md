@@ -2,7 +2,6 @@
 title: Git 자주 쓰는 명령어
 description: 매번 검색하게 되는 Git 명령어 모음
 tags: [git, 도구]
-status: growing
 created: 2026-10-28
 updated: 2026-10-28
 ---

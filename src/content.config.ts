@@ -18,8 +18,6 @@ const wiki = defineCollection({
     // 비워두면 폴더 경로가 카테고리가 된다 (예: wiki/dev/redis.md → dev)
     category: optionalText,
     tags: list,
-    // 글의 성숙도: 씨앗(seed) → 자라는 중(growing) → 완성(evergreen)
-    status: z.enum(['seed', 'growing', 'evergreen']).nullish().transform((v) => v ?? 'growing'),
     created: optionalDate,
     updated: optionalDate,
     draft: z.boolean().nullish().transform((v) => v ?? false),

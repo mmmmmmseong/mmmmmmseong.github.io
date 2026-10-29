@@ -53,7 +53,6 @@ public/admin/           웹 관리자 화면 (Sveltia CMS)
 | --- | --- |
 | `title` | 제목 (비우면 파일 이름) |
 | `tags` | 태그 목록 → `/tags` 페이지에 모임 |
-| `status` | `seed` 🌱 씨앗 / `growing` 🌿 자라는 중 / `evergreen` 🌳 완성 |
 | `draft: true` | 사이트에 공개하지 않음 |
 | `featured: true` | (프로젝트) 홈 화면 대표 프로젝트로 표시 |
 

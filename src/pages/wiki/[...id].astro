@@ -4,7 +4,6 @@ import Base from '../../layouts/Base.astro';
 import WikiTree from '../../components/WikiTree.astro';
 import Connections from '../../components/Connections.astro';
 import { buildTree, connections, formatDate, getProjects, getWiki, urlOf, wikiCategory, type Wiki } from '../../lib/content';
-import { STATUS_LABEL } from '../../site.config';
 
 export async function getStaticPaths() {
   const entries = await getWiki();
@@ -17,7 +16,7 @@ const all = await getWiki();
 const tree = buildTree(all);
 const related = connections(entry, [...(await getProjects()), ...all]);
 const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
-const { title, description, tags, status, created, updated } = entry.data;
+const { title, description, tags, created, updated } = entry.data;
 const category = wikiCategory(entry);
 ---
 
@@ -34,7 +33,6 @@ const category = wikiCategory(entry);
         <h1>{title}</h1>
         {description && <p class="desc">{description}</p>}
         <div class="meta">
-          <span class="badge" title="문서 상태">{STATUS_LABEL[status]}</span>
           {created && <span>작성 {formatDate(created)}</span>}
           {updated && <span>수정 {formatDate(updated)}</span>}
         </div>

@@ -1,7 +1,6 @@
 ---
 import type { Wiki } from '../lib/content';
 import { formatDate, urlOf, wikiCategory } from '../lib/content';
-import { STATUS_LABEL } from '../site.config';
 
 interface Props {
   entries: Wiki[];
@@ -20,7 +19,6 @@ const { entries } = Astro.props;
         </a>
         <span class="meta">
           {wikiCategory(e) && <span>{wikiCategory(e)}</span>}
-          <span title="문서 상태">{STATUS_LABEL[e.data.status]}</span>
           {e.data.updated && <time datetime={e.data.updated.toISOString()}>{formatDate(e.data.updated)}</time>}
         </span>
       </li>
