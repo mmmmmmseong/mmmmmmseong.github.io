@@ -59,6 +59,11 @@ public/admin/           웹 관리자 화면 (Sveltia CMS)
 
 자세한 예시는 `content/wiki/위키-사용법.md` 를 참고하세요.
 
+## 상위 문서와 하위 문서
+
+폴더와 같은 이름의 문서(예: `wiki/tools/vscode.md` + `wiki/tools/vscode/` 폴더)를 만들면, 상위 문서에서 하위 문서를 펼쳐 보거나 따로 열 수 있습니다.
+하위 문서 순서는 속성의 `order`(작을수록 앞)로 정합니다. 자세한 내용은 `content/wiki/위키-사용법.md`를 참고하세요.
+
 ## 태그 관리
 
 태그는 `content/tags.yml` 한 곳에서 관리합니다. `/admin` → **태그 관리 → 태그 목록**에서 추가·수정·삭제하세요.

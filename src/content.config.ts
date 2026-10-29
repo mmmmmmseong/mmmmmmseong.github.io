@@ -22,6 +22,8 @@ const wiki = defineCollection({
     // 비워두면 폴더 경로가 카테고리가 된다 (예: wiki/dev/redis.md → dev)
     category: optionalText,
     tags: list,
+    // 같은 상위 문서 아래에서 하위 문서가 나오는 순서 (작을수록 앞)
+    order: z.number().nullish().transform((v) => v ?? 0),
     created: optionalDate,
     updated: optionalDate,
     draft: z.boolean().nullish().transform((v) => v ?? false),

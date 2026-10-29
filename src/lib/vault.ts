@@ -157,7 +157,10 @@ function transformBody(body: string, index: VaultIndex): string {
         return `<a class="wikilink" href="${note.url}${anchor}">${escapeHtml(label)}</a>`;
       })
       // 일반 마크다운 이미지 중 attachments 폴더를 가리키는 상대 경로도 사이트 URL로 맞춘다.
-      .replace(/(!\[[^\]]*\]\()(?:\.{0,2}\/)*attachments\/([^)\s]+)/g, (_all, head: string, rel: string) => head + attachmentUrl(decodeURI(rel))),
+      .replace(/(!\[[^\]]*\]\()(?:\.{0,2}\/)*attachments\/([^)\s]+)/g, (_all, head: string, rel: string) => head + attachmentUrl(decodeURI(rel)))
+      // **굵게**를 직접 <strong>으로 바꾼다. 마크다운 규칙상 `**인코딩(Encoding)**은`처럼
+      // 닫는 ** 앞이 문장부호이고 뒤에 조사가 붙으면 굵게 처리되지 않는데, 한국어에서는 이런 경우가 흔하다.
+      .replace(/\*\*(?=\S)([^*\n]*?\S)\*\*/g, '<strong>$1</strong>'),
   );
 }
 
