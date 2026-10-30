@@ -26,7 +26,7 @@ collections:
     folder: content/wiki
     create: true
     # 하위 폴더(분류)를 트리로 보여주고, 글마다 폴더를 고를 수 있게 한다.
-    nested: { depth: 5 }
+    nested: { depth: 5, subfolders: false }  # 폴더 안에 일반 .md 파일 (글마다 index.md 폴더를 만드는 방식이 아님)
     meta: { path: { label: 분류 폴더 } }
     summary: "{{title}}"
     sortable_fields: [title, updated]
@@ -58,7 +58,7 @@ collections:
     folder: content/projects
     create: true
     # 프로젝트 폴더(예: content/projects/mode/) 안에 하위 문서를 만들 수 있다.
-    nested: { depth: 2 }
+    nested: { depth: 2, subfolders: false }
     meta: { path: { label: 상위 프로젝트 폴더 } }
     summary: "{{title}}"
     sortable_fields: [title, updated, order]
