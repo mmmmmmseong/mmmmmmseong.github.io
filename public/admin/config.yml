@@ -57,6 +57,9 @@ collections:
     label_singular: 프로젝트
     folder: content/projects
     create: true
+    # 프로젝트 폴더(예: content/projects/mode/) 안에 하위 문서를 만들 수 있다.
+    nested: { depth: 2 }
+    meta: { path: { label: 상위 프로젝트 폴더 } }
     summary: "{{title}}"
     sortable_fields: [title, updated, order]
     preview_path: "projects/{{slug}}"
@@ -82,7 +85,7 @@ collections:
       - { name: demo, label: 데모 주소, widget: string, required: false }
       - { name: thumbnail, label: 대표 이미지, widget: image, required: false }
       - { name: featured, label: 홈에 대표로 표시, widget: boolean, default: false, required: false }
-      - { name: order, label: 정렬 순서, widget: number, default: 0, value_type: int, required: false, hint: "클수록 앞에 나옵니다" }
+      - { name: order, label: 정렬 순서, widget: number, default: 0, value_type: int, required: false, hint: "프로젝트 목록에서는 클수록 앞, 하위 문서끼리는 작을수록 앞에 나온다." }
       - { name: updated, label: 수정일, widget: datetime, type: date, format: YYYY-MM-DD, auto_now: true, required: false }
       - { name: draft, label: "비공개 (초안)", widget: boolean, default: false, required: false }
       - { name: body, label: 본문, widget: markdown }

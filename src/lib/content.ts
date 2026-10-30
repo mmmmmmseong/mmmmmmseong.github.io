@@ -3,7 +3,7 @@ import { extractLinkKeys, noteKey, SECTIONS } from './vault';
 
 export type Wiki = CollectionEntry<'wiki'>;
 export type Project = CollectionEntry<'projects'>;
-type Note = Wiki | Project;
+export type Note = Wiki | Project;
 
 // draft: true 인 글은 개발 서버에서만 보이고 실제 사이트에는 올라가지 않는다.
 const visible = (e: { data: { draft: boolean } }) => import.meta.env.DEV || !e.data.draft;
@@ -13,14 +13,20 @@ export async function getWiki(): Promise<Wiki[]> {
   return items.sort((a, b) => lastTouched(b) - lastTouched(a) || a.data.title.localeCompare(b.data.title, 'ko'));
 }
 
+/** 프로젝트 목록에 나오는 프로젝트 (하위 문서 제외) */
 export async function getProjects(): Promise<Project[]> {
-  const items = await getCollection('projects', visible);
+  const items = (await getAllProjects()).filter((e) => !e.id.includes('/'));
   return items.sort(
     (a, b) =>
       Number(b.data.featured) - Number(a.data.featured) ||
       b.data.order - a.data.order ||
       lastTouched(b) - lastTouched(a),
   );
+}
+
+/** 하위 문서(예: mode/mode-v0-6)까지 포함한 모든 프로젝트 문서 */
+export async function getAllProjects(): Promise<Project[]> {
+  return getCollection('projects', visible);
 }
 
 export function lastTouched(e: Note): number {
@@ -62,13 +68,13 @@ export interface TreeNode {
   page?: Wiki; // 폴더와 이름이 같은 상위 문서 (예: tools/vscode.md ↔ tools/vscode/)
 }
 
-/** 하위 문서 순서: order → 제목 */
-function byOrder(a: Wiki, b: Wiki): number {
+/** 하위 문서 순서: order → 제목 (위키·프로젝트 공통) */
+function byOrder(a: Note, b: Note): number {
   return a.data.order - b.data.order || a.data.title.localeCompare(b.data.title, 'ko');
 }
 
-/** 상위 문서: tools/vscode/vscode-기본 → tools/vscode */
-export function wikiParent(entry: Wiki, all: Wiki[]): Wiki | undefined {
+/** 상위 문서: tools/vscode/vscode-기본 → tools/vscode, mode/mode-v0-6 → mode */
+export function parentOf<T extends Note>(entry: T, all: T[]): T | undefined {
   const i = entry.id.lastIndexOf('/');
   if (i === -1) return undefined;
   const parentId = entry.id.slice(0, i);
@@ -76,9 +82,47 @@ export function wikiParent(entry: Wiki, all: Wiki[]): Wiki | undefined {
 }
 
 /** 바로 아래 하위 문서: tools/vscode → tools/vscode/* (더 깊은 문서는 각자의 상위 문서에 속함) */
-export function wikiChildren(entry: Wiki, all: Wiki[]): Wiki[] {
+export function childrenOf<T extends Note>(entry: T, all: T[]): T[] {
   const prefix = entry.id + '/';
   return all.filter((e) => e.id.startsWith(prefix) && !e.id.slice(prefix.length).includes('/')).sort(byOrder);
+}
+
+/** 같은 상위 문서 아래에서 바로 앞·뒤 문서 */
+export function siblingsOf<T extends Note>(entry: T, all: T[]): { prev?: T; next?: T } {
+  const parent = parentOf(entry, all);
+  if (!parent) return {};
+  const siblings = childrenOf(parent, all);
+  const i = siblings.findIndex((e) => e.id === entry.id);
+  return { prev: i > 0 ? siblings[i - 1] : undefined, next: i !== -1 ? siblings[i + 1] : undefined };
+}
+
+export interface SubDoc {
+  doc: Note;
+  prefix: string; // 이 페이지 안에서 쓰는 구분자 (= 펼침 상자의 id)
+  html: string;
+  headings: { depth: number; slug: string; text: string }[];
+}
+
+/**
+ * 하위 문서를 상위 문서 페이지 안에 펼쳐 넣을 수 있게 준비한다.
+ * 여러 문서를 한 페이지에 넣으면 같은 제목 주소(#설치 등)가 겹치므로, 하위 문서마다 앞에 구분자를 붙인다.
+ */
+export function prepareSubDocs(children: Note[]): SubDoc[] {
+  return children.map((doc) => {
+    const prefix = noteKey(doc.id);
+    const html = (doc.rendered?.html ?? '')
+      .replace(/\sid="([^"]+)"/g, ` id="${prefix}--$1"`)
+      .replace(/href="#([^"]+)"/g, `href="#${prefix}--$1"`);
+    const headings = ((doc.rendered?.metadata?.headings ?? []) as SubDoc['headings'])
+      .filter((h) => h.depth === 2)
+      .map((h) => ({ ...h, slug: `${prefix}--${h.slug}` }));
+    return { doc, prefix, html, headings };
+  });
+}
+
+/** 목차에 넣을 하위 문서 항목 (하위 문서 제목 + 그 안의 소제목) */
+export function subDocToc(subs: SubDoc[]): { depth: number; slug: string; text: string }[] {
+  return subs.flatMap((s) => [{ depth: 2, slug: s.prefix, text: s.doc.data.title }, ...s.headings.map((h) => ({ ...h, depth: 3 }))]);
 }
 
 /** 카테고리 경로("dev/database")로 위키 트리를 만든다. */

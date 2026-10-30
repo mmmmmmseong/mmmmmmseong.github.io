@@ -2,26 +2,58 @@
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Connections from '../../components/Connections.astro';
-import { connections, getProjects, getTagInfo, getWiki, type Project } from '../../lib/content';
+import SubDocs from '../../components/SubDocs.astro';
+import DocPager from '../../components/DocPager.astro';
+import {
+  childrenOf,
+  connections,
+  getAllProjects,
+  getTagInfo,
+  getWiki,
+  parentOf,
+  prepareSubDocs,
+  siblingsOf,
+  urlOf,
+  type Project,
+} from '../../lib/content';
 
 export async function getStaticPaths() {
-  const projects = await getProjects();
+  // 하위 문서(예: mode/mode-v0-6)도 각자 페이지를 가진다.
+  const projects = await getAllProjects();
   return projects.map((project) => ({ params: { id: project.id }, props: { project } }));
 }
 
 const { project } = Astro.props as { project: Project };
 const { Content } = await render(project);
 const { title, summary, period, role, stack, tags, github, demo, thumbnail } = project.data;
-const related = connections(project, [...(await getWiki()), ...(await getProjects())]);
+const all = await getAllProjects();
+const related = connections(project, [...(await getWiki()), ...all]);
 const tagInfo = await getTagInfo();
+
+const subs = prepareSubDocs(childrenOf(project, all)); // 상위 프로젝트라면: 하위 문서
+const parent = parentOf(project, all); // 하위 문서라면: 상위 프로젝트와 이전·다음 문서
+const { prev, next } = siblingsOf(project, all);
+const hasFacts = Boolean(period || role || stack.length);
 ---
 
 <Base title={title} description={summary}>
   <article>
-    <a class="back" href="/projects">← 프로젝트</a>
+    {
+      parent ? (
+        <a class="back parent-link" href={urlOf(parent)}>
+          ↑ {parent.data.title}
+        </a>
+      ) : (
+        <a class="back" href="/projects">
+          ← 프로젝트
+        </a>
+      )
+    }
     <header>
       <h1>{title}</h1>
       {summary && <p class="summary">{summary}</p>}
+      {subs.length > 0 && <p class="sub-count">하위 문서 {subs.length}개 · <a href="#subdocs">아래에서 보기</a></p>}
+      {hasFacts && (
       <dl class="facts">
         {
           period && (
@@ -54,6 +86,7 @@ const tagInfo = await getTagInfo();
           )
         }
       </dl>
+      )}
       {
         (github || demo) && (
           <div class="links">
@@ -78,6 +111,9 @@ const tagInfo = await getTagInfo();
       <Content />
     </div>
 
+    <div id="subdocs"><SubDocs subs={subs} /></div>
+    <DocPager prev={prev} next={next} />
+
     {
       tags.length > 0 && (
         <ul class="tags footer-tags">
@@ -99,6 +135,8 @@ const tagInfo = await getTagInfo();
 <style>
   article { max-width: 780px; margin: 0 auto; }
   .back { color: var(--muted); font-size: 0.9rem; }
+  .parent-link { color: var(--accent); font-weight: 600; }
+  .sub-count { margin: 10px 0 0; color: var(--muted); font-size: 0.88rem; }
   header { margin: 16px 0 32px; }
   h1 { margin: 0 0 8px; font-size: clamp(1.7rem, 4vw, 2.2rem); letter-spacing: -0.02em; }
   .summary { margin: 0; color: var(--muted); font-size: 1.08rem; }

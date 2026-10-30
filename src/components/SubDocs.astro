@@ -1,0 +1,122 @@
+---
+// 상위 문서 아래에 붙는 하위 문서 목록. 그 자리에서 펼쳐 읽거나 따로 열 수 있다. (위키·프로젝트 공통)
+import type { SubDoc } from '../lib/content';
+import { urlOf } from '../lib/content';
+
+interface Props {
+  subs: SubDoc[];
+}
+
+const { subs } = Astro.props;
+const descOf = (s: SubDoc) => ('description' in s.doc.data ? s.doc.data.description : s.doc.data.summary);
+---
+
+{
+  subs.length > 0 && (
+    <section class="subdocs" aria-label="하위 문서">
+      <div class="subdocs-head">
+        <h2>하위 문서</h2>
+        <button type="button" class="toggle-all" aria-pressed="false">
+          모두 펼치기
+        </button>
+      </div>
+      {subs.map((s) => (
+        <details class="subdoc" id={s.prefix}>
+          <summary>
+            <span class="sub-title">{s.doc.data.title}</span>
+            {descOf(s) && <span class="sub-desc">{descOf(s)}</span>}
+          </summary>
+          <div class="sub-body">
+            <a class="sub-link" href={urlOf(s.doc)}>
+              이 문서만 따로 보기 →
+            </a>
+            <div class="prose" set:html={s.html} />
+          </div>
+        </details>
+      ))}
+    </section>
+  )
+}
+
+<script>
+  const subdocs = [...document.querySelectorAll<HTMLDetailsElement>('details.subdoc')];
+  const toggle = document.querySelector<HTMLButtonElement>('.subdocs .toggle-all');
+
+  const sync = () => {
+    if (!toggle) return;
+    const allOpen = subdocs.every((d) => d.open);
+    toggle.textContent = allOpen ? '모두 접기' : '모두 펼치기';
+    toggle.setAttribute('aria-pressed', String(allOpen));
+  };
+
+  toggle?.addEventListener('click', () => {
+    const open = !subdocs.every((d) => d.open);
+    subdocs.forEach((d) => (d.open = open));
+  });
+  subdocs.forEach((d) => d.addEventListener('toggle', sync));
+
+  // 목차나 주소(#...)로 접힌 하위 문서 안의 제목을 가리키면 펼친 뒤 그 위치로 이동한다.
+  const reveal = () => {
+    if (!location.hash) return;
+    const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    const box = target?.closest('details.subdoc') as HTMLDetailsElement | null;
+    if (target && box && !box.open) {
+      box.open = true;
+      target.scrollIntoView();
+    }
+  };
+  window.addEventListener('hashchange', reveal);
+  reveal();
+</script>
+
+<style>
+  .subdocs { margin-top: 48px; }
+  .subdocs-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+  .subdocs-head h2 { margin: 0; font-size: 1.3rem; }
+  .toggle-all {
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--muted);
+    font: inherit;
+    font-size: 0.86rem;
+    cursor: pointer;
+  }
+  .toggle-all:hover { color: var(--accent); border-color: var(--accent); }
+  .subdoc {
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    scroll-margin-top: 80px;
+  }
+  .subdoc > summary {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 14px 18px 14px 40px;
+    position: relative;
+    cursor: pointer;
+    list-style: none;
+  }
+  .subdoc > summary::-webkit-details-marker { display: none; }
+  .subdoc > summary::before {
+    content: '▸';
+    position: absolute;
+    left: 18px;
+    top: 15px;
+    color: var(--muted);
+    transition: transform 0.15s ease;
+  }
+  .subdoc[open] > summary::before { transform: rotate(90deg); }
+  .subdoc > summary:hover .sub-title { color: var(--accent); }
+  .sub-title { font-weight: 700; font-size: 1.05rem; }
+  .sub-desc { color: var(--muted); font-size: 0.9rem; }
+  .sub-body { padding: 4px 22px 22px; border-top: 1px solid var(--border); }
+  .sub-link { display: inline-block; margin: 14px 0 6px; font-size: 0.88rem; }
+
+  @media (max-width: 820px) {
+    .sub-body { padding: 4px 14px 16px; }
+  }
+</style>
