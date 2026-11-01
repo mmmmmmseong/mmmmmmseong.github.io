@@ -77,7 +77,7 @@ const canonical = new URL(path, Astro.site);
 
     <footer class="site-footer">
       <div class="container footer-inner">
-        <span>© {new Date().getFullYear()} {SITE.title}</span>
+        <span>© {new Date().getFullYear()} {SITE.title}. All rights reserved.</span>
         <span class="footer-links">
           {SITE.links.github && <a href={SITE.links.github}>GitHub</a>}
           {SITE.links.email && <a href={`mailto:${SITE.links.email}`}>Email</a>}
