@@ -29,7 +29,7 @@ updated: 2026-10-29
 
 1. 명령 팔레트 → `Python: Select Interpreter`
 2. 프로젝트의 `.venv`를 고른다.
-3. 상태 표시줄 오른쪽 아래에 고른 버전과 가상환경 이름이 보이는지 확인한다.
+3. 상태 표시줄 오른쪽 아래에 고른 버전과 가상환경 이름이 보이는지 확인해보자.
 
 ### 가상환경 만들기
 
@@ -42,17 +42,17 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-PowerShell에서 "이 시스템에서 스크립트를 실행할 수 없으므로…" 오류가 나면, 현재 사용자에게만 스크립트 실행을 허용한다.
+PowerShell에서 "이 시스템에서 스크립트를 실행할 수 없으므로…" 오류가 나면, 현재 사용자에게만 스크립트 실행을 허용하면 된다.
 
 ```powershell
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 ```
 
-`.venv`는 `.gitignore`에 넣는다.
+`.venv`는 `.gitignore`에 넣어두자.
 
 ### Flask 디버깅
 
-`print()`를 여기저기 넣는 대신 **중단점**을 쓴다. 줄 번호 왼쪽을 클릭해 빨간 점을 찍고 `F5`로 실행하면, 그 줄에서 멈춰 변수 값을 볼 수 있다.
+`print()`를 여기저기 넣는 대신 **중단점**을 써보자. 줄 번호 왼쪽을 클릭해 빨간 점을 찍고 `F5`로 실행하면, 그 줄에서 멈춰 변수 값을 볼 수 있다.
 
 `.vscode/launch.json`:
 
@@ -137,8 +137,8 @@ Fabric Loom은 VS Code용 실행 설정을 만들어 준다.
 HTML·CSS·JS는 VS Code에 기본으로 들어 있어서 따로 확장이 필요 없다. 여기에 **Live Server**를 쓴다.
 
 - HTML 파일을 연 상태에서 상태 표시줄의 **Go Live**를 누르면 브라우저가 열리고, 저장할 때마다 자동으로 새로고침된다.
-- Flask 템플릿처럼 서버가 그려주는 페이지에는 맞지 않는다. 그때는 Flask를 직접 실행한다.
-- 이 사이트(Astro)는 `npm run dev`로 띄운다.
+- Flask 템플릿처럼 서버가 그려주는 페이지에는 맞지 않는다. 그때는 Flask를 직접 실행하면 된다.
+- 이 사이트(Astro)는 `npm run dev`로 띄우면 된다.
 
 ## C/C++
 

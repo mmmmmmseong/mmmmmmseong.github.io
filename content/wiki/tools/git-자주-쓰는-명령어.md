@@ -54,6 +54,6 @@ git commit -m "Stop tracking .env"
 
 `rm --cached`는 **앞으로** 추적하지 않게 할 뿐, 이전 커밋에는 그대로 남아 있다. 비밀값이었다면 먼저 키를 바꿔야 한다. ([[env로-api-키-관리]])
 
-`__pycache__/`, `*.db`, `.env`처럼 실행하면 생기는 파일은 처음부터 `.gitignore`에 넣어둔다.
+`__pycache__/`, `*.db`, `.env`처럼 실행하면 생기는 파일은 처음부터 `.gitignore`에 넣어두자.
 
 > 작성법은 [[위키-사용법]] 참고.

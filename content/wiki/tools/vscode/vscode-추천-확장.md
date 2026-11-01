@@ -28,7 +28,7 @@ updated: 2026-10-29
 ## 웹 개발
 
 ### Live Server
-HTML 파일을 브라우저로 띄우고, 저장할 때마다 자동으로 새로고침한다. 상태 표시줄의 **Go Live**로 켠다.
+HTML 파일을 브라우저로 띄우고, 저장할 때마다 자동으로 새로고침한다. 상태 표시줄의 **Go Live**로 켜면 된다.
 
 ### htmltagwrap
 글자를 선택하고 `Alt+W`를 누른 뒤 태그 이름을 치면, 선택한 부분을 태그로 감싼다.
@@ -38,7 +38,7 @@ HTML 파일을 브라우저로 띄우고, 저장할 때마다 자동으로 새�
 ```
 
 ### REST Client
-`.http` 파일에 요청을 적어두고 **Send Request**를 눌러 API를 시험한다. 브라우저나 Postman 없이 VS Code 안에서 끝난다.
+`.http` 파일에 요청을 적어두고 **Send Request**를 눌러 API를 시험해볼 수 있다. 브라우저나 Postman 없이 VS Code 안에서 끝난다.
 
 > 관련 프로젝트: [[promptinjection|Break The AI]] · [GitHub](https://github.com/mmmmmmseong/PromptInjection)
 
@@ -68,17 +68,17 @@ CSV의 열마다 색을 다르게 칠해서, 쉼표로만 구분된 데이터를
 등산 지도의 `PathMap.csv`처럼 위치 이름에 쉼표가 들어가 열이 밀리는 문제를 바로 눈으로 찾을 수 있다.
 
 ### SQLite
-`.db` 파일을 열어 테이블을 보고 쿼리를 실행한다. 명령 팔레트 → `SQLite: Open Database`로 열면 탐색기 아래에 **SQLITE EXPLORER**가 생긴다.
+`.db` 파일을 열어 테이블을 보고 쿼리를 실행할 수 있다. 명령 팔레트 → `SQLite: Open Database`로 열면 탐색기 아래에 **SQLITE EXPLORER**가 생긴다.
 
 > 관련 프로젝트: [[promptinjection|Break The AI]] · [GitHub](https://github.com/mmmmmmseong/PromptInjection) / [[ctf|웹 CTF]] · [GitHub](https://github.com/mmmmmmseong/CTF)
 
-랭킹이 제대로 쌓이는지(`rank.db`), CTF 사용자 데이터가 맞는지(`users.db`) 확인할 때 쓴다. 쿼리 작성은 [[sqlite-기본]] 참고.
+랭킹이 제대로 쌓이는지(`rank.db`), CTF 사용자 데이터가 맞는지(`users.db`) 확인할 때 쓰고 있다. 쿼리 작성은 [[sqlite-기본]] 참고.
 
 ## 기록·공유
 
 ### CodeSnap+
 선택한 코드를 **깔끔한 이미지**로 저장한다. 위키, 발표 자료, SNS에 코드를 보여줄 때 화면 캡처보다 보기 좋다.
-코드를 선택하고 명령 팔레트 → `CodeSnap`을 실행한다.
+코드를 선택하고 명령 팔레트 → `CodeSnap`을 실행하면 된다.
 
 ## 보안·분석
 
@@ -90,12 +90,12 @@ CSV의 열마다 색을 다르게 칠해서, 쉼표로만 구분된 데이터를
 | **APKLab** | APK를 풀어서(apktool) Smali 코드와 리소스로 만들고, 필요하면 Java 코드로도 되돌린다(jadx). 고친 뒤 다시 APK로 묶고 서명까지 한다 |
 | **Smali** / **Smalise** | Smali(안드로이드 바이트코드를 사람이 읽을 수 있게 만든 언어) 문법 강조와 정의로 이동 같은 편집 기능 |
 
-명령 팔레트 → `APKLab: Open an APK`로 시작한다. Java가 설치되어 있어야 한다.
+명령 팔레트 → `APKLab: Open an APK`로 시작하면 된다. Java가 설치되어 있어야 한다.
 
-> ⚠️ 분석은 **내가 만든 앱이나 분석이 허락된 앱**(워게임, CTF 문제 등)에만 한다. 다른 사람의 앱을 허락 없이 고쳐 배포하는 것은 불법이다.
+> ⚠️ 분석은 **내가 만든 앱이나 분석이 허락된 앱**(워게임, CTF 문제 등)에만 하자. 다른 사람의 앱을 허락 없이 고쳐 배포하는 것은 불법이다.
 
 ## AI
 
 ### Claude Code
 터미널에서 쓰는 AI 코딩 도구 Claude Code를 VS Code 안에서 쓸 수 있게 해준다. 지금 열린 파일과 선택한 코드를 바로 맥락으로 넘길 수 있다.
-AI가 고친 코드는 **소스 제어 화면에서 변경 내용을 확인한 뒤** 커밋한다.
+AI가 고친 코드는 **소스 제어 화면에서 변경 내용을 확인한 뒤** 커밋하도록 하자.

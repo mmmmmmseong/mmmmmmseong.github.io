@@ -51,7 +51,7 @@ app.secret_key = os.environ["FLASK_SECRET_KEY"]
 # 키 만들기: python -c "import secrets; print(secrets.token_hex(32))"
 ```
 
-키는 `.env`에 두고 저장소에 올리지 않는다. ([[env로-api-키-관리]])
+키는 `.env`에 두고 저장소에 올리지 않도록 하자. ([[env로-api-키-관리]])
 
 ## 디버그 모드
 
@@ -60,7 +60,7 @@ app.run(host='0.0.0.0', port=5000, debug=True)
 ```
 
 `debug=True`는 개발할 때 편하지만, 오류가 나면 **브라우저에서 파이썬 코드를 실행할 수 있는 디버거**가 열린다(PIN으로 보호되지만 안전하다고 보기 어렵다).
-`host='0.0.0.0'`과 함께 쓰면 같은 네트워크의 다른 사람도 접속할 수 있으니, 공개할 때는 반드시 끈다.
+`host='0.0.0.0'`과 함께 쓰면 같은 네트워크의 다른 사람도 접속할 수 있으니, 공개할 때는 반드시 꺼두자.
 
 ```python
 debug = os.environ.get("FLASK_DEBUG") == "1"
@@ -69,5 +69,5 @@ app.run(debug=debug)
 
 ## 더 알아볼 것
 
-- 세션 내용을 서버에 저장하고 싶으면 Flask-Session 같은 확장을 쓴다.
-- 세션에 저장한 사용자 정보로 **권한을 확인하는 것**을 잊지 않는다. ([[idor]])
+- 세션 내용을 서버에 저장하고 싶으면 Flask-Session 같은 확장을 쓰면 된다.
+- 세션에 저장한 사용자 정보로 **권한을 확인하는 것**도 잊지 말자. ([[idor]])

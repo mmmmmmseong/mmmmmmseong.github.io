@@ -39,7 +39,7 @@ rows = db.execute(
 ).fetchall()
 ```
 
-f-string으로 값을 넣으면 [[sql-인젝션]]이 생긴다. 값이 하나여도 `(stage,)`처럼 **튜플**로 넘긴다.
+f-string으로 값을 넣으면 [[sql-인젝션]]이 생긴다. 값이 하나여도 `(stage,)`처럼 **튜플**로 넘겨야 한다.
 
 ## 트랜잭션과 연결 닫기
 
@@ -53,7 +53,7 @@ with closing(get_db()) as db:   # 블록이 끝나면 연결을 닫음
         db.execute("INSERT ...", (...))
 ```
 
-헷갈리기 쉬운 점: **`with db:`는 연결을 닫지 않는다.** commit/rollback만 해준다. 그래서 `closing()`으로 한 번 더 감싼다.
+헷갈리기 쉬운 점: **`with db:`는 연결을 닫지 않는다.** commit/rollback만 해준다. 그래서 `closing()`으로 한 번 더 감싸야 한다.
 
 ## 결과를 이름으로 읽기
 

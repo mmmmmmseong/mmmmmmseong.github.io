@@ -34,7 +34,7 @@ st.write(st.session_state.count)
 
 ## 느린 작업은 캐시
 
-CSV 읽기, 지도 데이터 계산처럼 매번 할 필요 없는 작업은 캐시한다.
+CSV 읽기, 지도 데이터 계산처럼 매번 할 필요 없는 작업은 캐시해두자.
 
 ```python
 @st.cache_data
@@ -68,7 +68,7 @@ if st.sidebar.button("지도"):
 `st.page_link("main.py")`나 등록되지 않은 페이지로 `st.switch_page()`를 부르면 `KeyError`가 난다.
 `st.navigation`을 쓰면 **진입 파일(main.py)은 페이지 목록에 없기 때문**이다.
 
-해결: 이동할 페이지를 모두 `st.Page`로 등록하고, 진입 파일이 아니라 **등록한 페이지 파일**로 이동한다.
+해결: 이동할 페이지를 모두 `st.Page`로 등록하고, 진입 파일이 아니라 **등록한 페이지 파일**로 이동하면 된다.
 
 ## 그 밖에
 
