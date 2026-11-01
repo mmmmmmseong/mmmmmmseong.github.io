@@ -12,7 +12,7 @@ updated: 2026-10-29
 ## 원리
 
 **IDOR(Insecure Direct Object Reference)**는 서버가 요청한 데이터의 **주인이 누구인지 확인하지 않아서**, ID 값만 바꾸면 다른 사람의 데이터에 접근할 수 있는 취약점이다.
-OWASP Top 10의 *Broken Access Control(접근 제어 실패)*에 속한다.
+[[owasp-top-10#a01-broken-access-control-접근-제어-실패|OWASP Top 10]]의 *Broken Access Control(접근 제어 실패)*에 속한다.
 
 CTF 프로젝트의 프로필 페이지는 일부러 이렇게 만들었다.
 

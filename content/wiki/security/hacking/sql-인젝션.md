@@ -57,3 +57,4 @@ CTF 프로젝트의 프로필 조회는 이미 이 방식을 쓴다. 그래서 S
 
 - [[sqlite-기본]]: 파라미터 바인딩을 쓰는 SQLite 기본 사용법
 - [[ctf-문제-설계]]: 이 취약점을 문제로 만든 과정
+- [[owasp-top-10#a05-injection-인젝션|OWASP Top 10]]: A05 Injection에 속한다

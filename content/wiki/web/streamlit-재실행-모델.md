@@ -34,7 +34,7 @@ st.write(st.session_state.count)
 
 ## 느린 작업은 캐시
 
-CSV 읽기, 지도 데이터 계산처럼 매번 할 필요 없는 작업은 캐시해두자.
+CSV 읽기, 지도 데이터 계산처럼 매번 할 필요 없는 작업은 캐시해두자. ([[캐싱과-캐시]])
 
 ```python
 @st.cache_data
