@@ -29,3 +29,6 @@ tags:
   - id: 학교
     name: 학교
     description: 학교 생활에 쓰려고 만든 것들
+  - id: cs
+    name: CS 기초
+    description: 컴퓨터 구조, 네트워크 같은 기본 지식
