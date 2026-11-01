@@ -2,6 +2,7 @@
 title: LLM 방어 기법
 description: 프롬프트 인젝션을 줄이는 설계 원칙과, 시스템 프롬프트만으로는 부족한 이유
 tags: [보안, ai]
+order: 2
 created: 2026-10-29
 updated: 2026-10-29
 ---

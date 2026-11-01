@@ -2,6 +2,7 @@
 title: CTF 문제 설계 노트
 description: 여러 취약점을 단계로 이어 붙여 웹 CTF 문제를 만드는 방법
 tags: [보안, 웹]
+order: 1
 created: 2026-10-29
 updated: 2026-10-29
 ---

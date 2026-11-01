@@ -2,6 +2,7 @@
 title: OWASP Top 10 (2025)
 description: 웹 애플리케이션에서 가장 중요한 보안 위험 10가지와 예시, 기본 방어법
 tags: [보안, 웹]
+order: 1
 created: 2026-11-01
 updated: 2026-11-01
 ---
