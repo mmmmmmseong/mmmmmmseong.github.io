@@ -47,7 +47,7 @@ const data = {
 <Base title="문서 지도" description="위키와 프로젝트 문서가 서로 어떻게 연결되어 있는지 보여주는 지도">
   <h1>문서 지도</h1>
   <p class="muted">
-    문서끼리 링크로 이어진 모습을 한눈에 볼 수 있어요. 점을 누르면 그 문서로 이동하고, 빈 곳을 끌면 지도를 둘러볼 수 있어요.
+    문서끼리 링크로 이어진 모습을 한눈에 볼 수 있어요. 점을 누르면 그 문서로 이동하고, 빈 곳을 끌면 지도를 둘러볼 수 있어요. 폰에서는 두 손가락으로 확대·축소할 수 있어요.
   </p>
   <p class="legend muted">
     <span><i class="dot wiki"></i>위키</span>
@@ -157,6 +157,8 @@ const data = {
     // 그래서 화면보다 지도가 크면 구획 밖으로 넘어가고, 빈 곳을 끌어서 둘러볼 수 있다.
     const view = { x: 0, y: 0, s: 1 };
     const pan = { x: 0, y: 0 }; // 사용자가 끌어서 옮긴 만큼
+    const center = { x: 0, y: 0 };
+    let zoom = 1; // 두 손가락으로 확대·축소한 배율
     let half = { w: 0, h: 0 };
     function fitTarget() {
       let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
@@ -167,12 +169,14 @@ const data = {
       const pad = 60;
       const fit = Math.min((W - pad * 2) / Math.max(x1 - x0, 1), (H - pad * 2) / Math.max(y1 - y0, 1));
       const minS = W < 600 ? 0.8 : 0.6;
-      const s = Math.min(Math.max(fit, minS), 1.3);
+      const s = Math.min(Math.max(fit, minS), 1.3) * zoom;
       // 지도 끝이 화면 가장자리에 닿을 때까지만 옮길 수 있게 한다
       half = { w: Math.max(0, ((x1 - x0) * s + pad * 2 - W) / 2 / s), h: Math.max(0, ((y1 - y0) * s + pad * 2 - H) / 2 / s) };
       pan.x = Math.min(Math.max(pan.x, -half.w), half.w);
       pan.y = Math.min(Math.max(pan.y, -half.h), half.h);
-      return { x: (x0 + x1) / 2 + pan.x, y: (y0 + y1) / 2 + pan.y, s };
+      center.x = (x0 + x1) / 2;
+      center.y = (y0 + y1) / 2;
+      return { x: center.x + pan.x, y: center.y + pan.y, s };
     }
     Object.assign(view, fitTarget());
     const toScreen = (d: Node) => [(d.x - view.x) * view.s + W / 2, (d.y - view.y) * view.s + H / 2];
@@ -204,16 +208,55 @@ const data = {
       const r = canvas.getBoundingClientRect();
       return [e.clientX - r.left, e.clientY - r.top];
     };
+    // 두 손가락 확대·축소: 손가락 사이 거리의 변화만큼 배율을 바꾸고,
+    // 두 손가락 가운데 있던 지점이 그 자리에 머물도록 시점을 함께 옮긴다.
+    const touches = new Map<number, number[]>();
+    let pinch: { dist: number; zoom: number } | null = null;
+    const pinchInfo = () => {
+      const [a, b] = [...touches.values()];
+      return { dist: Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, mx: (a[0] + b[0]) / 2, my: (a[1] + b[1]) / 2 };
+    };
+    function applyPinch() {
+      const { dist, mx, my } = pinchInfo();
+      const wx = (mx - W / 2) / view.s + view.x;
+      const wy = (my - H / 2) / view.s + view.y;
+      const next = Math.min(Math.max(pinch!.zoom * (dist / pinch!.dist), 0.5), 3);
+      view.s *= next / zoom;
+      zoom = next;
+      view.x = wx - (mx - W / 2) / view.s;
+      view.y = wy - (my - H / 2) / view.s;
+      fitTarget(); // 새 배율에 맞춰 옮길 수 있는 범위를 다시 계산
+      pan.x = Math.min(Math.max(view.x - center.x, -half.w), half.w);
+      pan.y = Math.min(Math.max(view.y - center.y, -half.h), half.h);
+    }
+
     canvas.addEventListener('pointerdown', (e) => {
       const [px, py] = local(e);
+      canvas.setPointerCapture(e.pointerId);
+      if (e.pointerType === 'touch') {
+        touches.set(e.pointerId, [px, py]);
+        if (touches.size === 2) {
+          // 두 번째 손가락이 닿으면 점 끌기·시점 이동을 멈추고 확대·축소로
+          pinch = { dist: pinchInfo().dist, zoom };
+          down = null;
+          dragged = null;
+          hover = null;
+          return;
+        }
+        if (touches.size > 2) return;
+      }
       const node = pick(px, py);
       down = { x: px, y: py, lx: px, ly: py, node, moved: false };
       if (node) { dragged = node; hover = node; }
       else canvas.style.cursor = 'grabbing';
-      canvas.setPointerCapture(e.pointerId);
     });
     canvas.addEventListener('pointermove', (e) => {
       const [px, py] = local(e);
+      if (touches.has(e.pointerId)) touches.set(e.pointerId, [px, py]);
+      if (pinch) {
+        if (touches.size === 2) applyPinch();
+        return;
+      }
       if (down) {
         if (Math.hypot(px - down.x, py - down.y) > 4) down.moved = true;
         if (dragged && down.moved) {
@@ -235,16 +278,27 @@ const data = {
       hover = pick(px, py);
       canvas.style.cursor = hover ? 'pointer' : half.w || half.h ? 'grab' : 'default';
     });
-    const release = () => {
+    const release = (e: PointerEvent) => {
+      touches.delete(e.pointerId);
+      if (pinch) {
+        // 확대·축소가 끝나면 손가락을 모두 뗄 때까지 다른 동작은 하지 않는다
+        if (touches.size === 0) pinch = null;
+        return;
+      }
       if (down?.node && !down.moved) location.href = down.node.u;
       down = null;
       dragged = null;
       canvas.style.cursor = hover ? 'pointer' : half.w || half.h ? 'grab' : 'default';
     };
-    // 두 번 누르면 가운데로
-    canvas.addEventListener('dblclick', () => { pan.x = 0; pan.y = 0; });
+    // 두 번 누르면 처음 보던 크기와 위치로
+    canvas.addEventListener('dblclick', () => { pan.x = 0; pan.y = 0; zoom = 1; });
     canvas.addEventListener('pointerup', release);
-    canvas.addEventListener('pointercancel', () => { down = null; dragged = null; });
+    canvas.addEventListener('pointercancel', (e) => {
+      touches.delete(e.pointerId);
+      if (touches.size === 0) pinch = null;
+      down = null;
+      dragged = null;
+    });
     canvas.addEventListener('pointerleave', () => { if (!down) hover = null; });
 
     // ── 그리기 ──
@@ -320,7 +374,7 @@ const data = {
     // ── 계속 움직이기 ──
     function frame(time: number) {
       tick(reduceMotion ? 0 : 0.035, time);
-      if (!dragged) {
+      if (!dragged && !pinch) {
         const t = fitTarget();
         view.x += (t.x - view.x) * 0.05;
         view.y += (t.y - view.y) * 0.05;
