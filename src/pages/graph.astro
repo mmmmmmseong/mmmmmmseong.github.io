@@ -47,7 +47,7 @@ const data = {
 <Base title="문서 지도" description="위키와 프로젝트 문서가 서로 어떻게 연결되어 있는지 보여주는 지도">
   <h1>문서 지도</h1>
   <p class="muted">
-    문서끼리 링크로 이어진 모습을 한눈에 볼 수 있어요. 점을 누르면 그 문서로 이동해요.
+    문서끼리 링크로 이어진 모습을 한눈에 볼 수 있어요. 점을 누르면 그 문서로 이동하고, 빈 곳을 끌면 지도를 둘러볼 수 있어요.
   </p>
   <p class="legend muted">
     <span><i class="dot wiki"></i>위키</span>
@@ -102,8 +102,8 @@ const data = {
           let dy = a.y - b.y;
           let d2 = dx * dx + dy * dy;
           if (d2 < 1) { dx = Math.random() - 0.5; dy = Math.random() - 0.5; d2 = 1; }
-          if (d2 > 160000) continue;
-          const f = 1500 / d2;
+          if (d2 > 360000) continue;
+          const f = 4500 / d2;
           const d = Math.sqrt(d2);
           a.vx += (dx / d) * f; a.vy += (dy / d) * f;
           b.vx -= (dx / d) * f; b.vy -= (dy / d) * f;
@@ -115,14 +115,14 @@ const data = {
         const dx = b.x - a.x;
         const dy = b.y - a.y;
         const d = Math.sqrt(dx * dx + dy * dy) || 1;
-        const f = (d - 80) * 0.012;
+        const f = (d - 120) * 0.006;
         a.vx += (dx / d) * f; a.vy += (dy / d) * f;
         b.vx -= (dx / d) * f; b.vy -= (dy / d) * f;
       }
       // 화면 비율에 맞춰 가운데로 모은다 (세로로 긴 폰 화면에서는 좌우를 더 세게)
       const ratio = W && H ? W / H : 1.4;
-      const gx = 0.005 * Math.max(1, 1.4 / ratio);
-      const gy = 0.005 * Math.max(1, ratio / 1.4);
+      const gx = 0.0022 * Math.max(1, 1.4 / ratio);
+      const gy = 0.0022 * Math.max(1, ratio / 1.4);
       for (const d of nodes) {
         d.vx -= d.x * gx;
         d.vy -= d.y * gy;
@@ -140,7 +140,7 @@ const data = {
         d.y += d.vy;
       }
     }
-    // ── 화면 크기와 보는 위치 (전체가 들어오게 부드럽게 맞춤) ──
+    // ── 화면 크기와 보는 위치 ──
     let W = 0, H = 0, dpr = 1;
     function resize() {
       const rect = canvas.getBoundingClientRect();
@@ -151,9 +151,13 @@ const data = {
     }
     new ResizeObserver(resize).observe(canvas);
     resize();
-    for (let k = 0; k < 400; k++) tick(0, 0); // 처음 모양을 미리 잡아둔다
+    for (let k = 0; k < 600; k++) tick(0, 0); // 처음 모양을 미리 잡아둔다
 
+    // 전체가 들어오도록 맞추되, 글자를 읽을 수 없을 만큼 작아지지는 않게 한다.
+    // 그래서 화면보다 지도가 크면 구획 밖으로 넘어가고, 빈 곳을 끌어서 둘러볼 수 있다.
     const view = { x: 0, y: 0, s: 1 };
+    const pan = { x: 0, y: 0 }; // 사용자가 끌어서 옮긴 만큼
+    let half = { w: 0, h: 0 };
     function fitTarget() {
       let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
       for (const d of nodes) {
@@ -161,8 +165,14 @@ const data = {
         y0 = Math.min(y0, d.y); y1 = Math.max(y1, d.y);
       }
       const pad = 60;
-      const s = Math.min((W - pad * 2) / Math.max(x1 - x0, 1), (H - pad * 2) / Math.max(y1 - y0, 1), 1.6);
-      return { x: (x0 + x1) / 2, y: (y0 + y1) / 2, s: Math.max(s, 0.2) };
+      const fit = Math.min((W - pad * 2) / Math.max(x1 - x0, 1), (H - pad * 2) / Math.max(y1 - y0, 1));
+      const minS = W < 600 ? 0.8 : 0.6;
+      const s = Math.min(Math.max(fit, minS), 1.3);
+      // 지도 끝이 화면 가장자리에 닿을 때까지만 옮길 수 있게 한다
+      half = { w: Math.max(0, ((x1 - x0) * s + pad * 2 - W) / 2 / s), h: Math.max(0, ((y1 - y0) * s + pad * 2 - H) / 2 / s) };
+      pan.x = Math.min(Math.max(pan.x, -half.w), half.w);
+      pan.y = Math.min(Math.max(pan.y, -half.h), half.h);
+      return { x: (x0 + x1) / 2 + pan.x, y: (y0 + y1) / 2 + pan.y, s };
     }
     Object.assign(view, fitTarget());
     const toScreen = (d: Node) => [(d.x - view.x) * view.s + W / 2, (d.y - view.y) * view.s + H / 2];
@@ -171,7 +181,7 @@ const data = {
     let colors: Record<string, string> = {};
     function readColors() {
       const cs = getComputedStyle(document.documentElement);
-      for (const k of ['accent', 'muted', 'border', 'text', 'surface']) colors[k] = cs.getPropertyValue(`--${k}`).trim();
+      for (const k of ['accent', 'muted', 'border', 'text', 'surface', 'graph-project']) colors[k] = cs.getPropertyValue(`--${k}`).trim();
     }
     readColors();
     const fontFamily = getComputedStyle(document.body).fontFamily;
@@ -179,7 +189,7 @@ const data = {
 
     // ── 마우스·터치 ──
     let hover: Node | null = null;
-    let down: { x: number; y: number; node: Node | null; moved: boolean } | null = null;
+    let down: { x: number; y: number; lx: number; ly: number; node: Node | null; moved: boolean } | null = null;
     function pick(px: number, py: number): Node | null {
       let best: Node | null = null;
       let bestD = Infinity;
@@ -197,8 +207,10 @@ const data = {
     canvas.addEventListener('pointerdown', (e) => {
       const [px, py] = local(e);
       const node = pick(px, py);
-      down = { x: px, y: py, node, moved: false };
-      if (node) { dragged = node; hover = node; canvas.setPointerCapture(e.pointerId); }
+      down = { x: px, y: py, lx: px, ly: py, node, moved: false };
+      if (node) { dragged = node; hover = node; }
+      else canvas.style.cursor = 'grabbing';
+      canvas.setPointerCapture(e.pointerId);
     });
     canvas.addEventListener('pointermove', (e) => {
       const [px, py] = local(e);
@@ -207,17 +219,30 @@ const data = {
         if (dragged && down.moved) {
           dragged.x = (px - W / 2) / view.s + view.x;
           dragged.y = (py - H / 2) / view.s + view.y;
+        } else if (!dragged) {
+          // 빈 곳을 끌면 시점 이동
+          pan.x -= (px - down.lx) / view.s;
+          pan.y -= (py - down.ly) / view.s;
+          pan.x = Math.min(Math.max(pan.x, -half.w), half.w);
+          pan.y = Math.min(Math.max(pan.y, -half.h), half.h);
+          view.x -= (px - down.lx) / view.s;
+          view.y -= (py - down.ly) / view.s;
         }
+        down.lx = px;
+        down.ly = py;
         return;
       }
       hover = pick(px, py);
-      canvas.style.cursor = hover ? 'pointer' : 'default';
+      canvas.style.cursor = hover ? 'pointer' : half.w || half.h ? 'grab' : 'default';
     });
     const release = () => {
       if (down?.node && !down.moved) location.href = down.node.u;
       down = null;
       dragged = null;
+      canvas.style.cursor = hover ? 'pointer' : half.w || half.h ? 'grab' : 'default';
     };
+    // 두 번 누르면 가운데로
+    canvas.addEventListener('dblclick', () => { pan.x = 0; pan.y = 0; });
     canvas.addEventListener('pointerup', release);
     canvas.addEventListener('pointercancel', () => { down = null; dragged = null; });
     canvas.addEventListener('pointerleave', () => { if (!down) hover = null; });
@@ -247,8 +272,17 @@ const data = {
       nodes.forEach((d, i) => {
         const [x, y] = pos[i];
         const lit = !hover || i === hi || focus!.has(i);
+        const color = d.p ? colors['graph-project'] : i === hi ? colors.accent : colors.muted;
+        if (d.p) {
+          // 프로젝트는 은은한 빛 테두리로 눈에 띄게
+          ctx.globalAlpha = lit ? 0.22 : 0.05;
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.arc(x, y, rad[i] + 5, 0, Math.PI * 2);
+          ctx.fill();
+        }
         ctx.globalAlpha = lit ? 1 : 0.15;
-        ctx.fillStyle = i === hi || d.p ? colors.accent : colors.muted;
+        ctx.fillStyle = color;
         ctx.beginPath();
         ctx.arc(x, y, i === hi ? rad[i] + 1.5 : rad[i], 0, Math.PI * 2);
         ctx.fill();
@@ -277,7 +311,7 @@ const data = {
         if (!must && placed.some((b) => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) continue;
         placed.push(box);
         ctx.globalAlpha = lit ? (i === hi ? 1 : 0.8) : 0.1;
-        ctx.fillStyle = i === hi ? colors.text : colors.muted;
+        ctx.fillStyle = i === hi ? colors.text : d.p ? colors['graph-project'] : colors.muted;
         ctx.fillText(text, x, y);
       }
       ctx.globalAlpha = 1;
@@ -300,12 +334,15 @@ const data = {
 </script>
 
 <style>
+  /* 프로젝트 점 색: 포인트 컬러 계열에서 더 선명한 파랑 */
+  :global(:root) { --graph-project: #2b6cd4; }
+  :global(:root[data-theme='dark']) { --graph-project: #6aa5ff; }
   h1 { margin: 0 0 4px; }
   .legend { display: flex; flex-wrap: wrap; gap: 16px; margin: 8px 0 20px; font-size: 0.9rem; }
   .legend span { display: inline-flex; align-items: center; gap: 6px; }
   .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; }
   .dot.wiki { background: var(--muted); }
-  .dot.project { background: var(--accent); }
+  .dot.project { background: var(--graph-project); box-shadow: 0 0 0 3px color-mix(in srgb, var(--graph-project) 25%, transparent); }
   .graph {
     position: relative;
     height: clamp(420px, 72vh, 820px);
