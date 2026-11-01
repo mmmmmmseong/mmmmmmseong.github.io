@@ -2,6 +2,7 @@
 title: SQL 인젝션
 description: 입력이 SQL 코드로 해석되는 취약점의 원리와 파라미터 바인딩으로 막는 법
 tags: [보안, 웹]
+order: 2
 created: 2026-10-29
 updated: 2026-10-29
 ---

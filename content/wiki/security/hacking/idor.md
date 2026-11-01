@@ -2,6 +2,7 @@
 title: IDOR (안전하지 않은 직접 객체 참조)
 description: 주소의 ID만 바꾸면 남의 데이터가 보이는 권한 검증 누락 취약점
 tags: [보안, 웹]
+order: 3
 created: 2026-10-29
 updated: 2026-10-29
 ---
