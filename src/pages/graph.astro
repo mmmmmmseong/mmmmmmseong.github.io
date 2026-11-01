@@ -1,0 +1,324 @@
+---
+import Base from '../layouts/Base.astro';
+import { getWiki, getAllProjects, parentOf, urlOf, type Note } from '../lib/content';
+import { extractLinkKeys, noteKey } from '../lib/vault';
+
+// 문서 지도: 위키·프로젝트 문서를 점으로, [[링크]]와 상위·하위 관계를 선으로 그린다.
+// 사이트를 빌드할 때마다 새로 계산되므로 따로 관리할 것은 없다.
+const wiki = await getWiki();
+const projects = await getAllProjects();
+const notes: Note[] = [...wiki, ...projects];
+
+const keyOf = (n: Note) => `${n.collection}:${n.id}`;
+const byKey = new Map<string, number>();
+const byName = new Map<string, number>();
+notes.forEach((n, i) => {
+  byKey.set(keyOf(n), i);
+  const name = noteKey(n.id);
+  if (!byName.has(name)) byName.set(name, i);
+});
+
+const edgeSet = new Set<string>();
+const edges: [number, number][] = [];
+function link(a: number, b: number) {
+  if (a === b) return;
+  const id = a < b ? `${a}-${b}` : `${b}-${a}`;
+  if (edgeSet.has(id)) return;
+  edgeSet.add(id);
+  edges.push([a, b]);
+}
+
+notes.forEach((n, i) => {
+  for (const key of extractLinkKeys(n.body ?? '')) {
+    const j = byName.get(key);
+    if (j !== undefined) link(i, j);
+  }
+  const same = n.collection === 'wiki' ? wiki : projects;
+  const parent = parentOf(n as never, same as never[]) as Note | undefined;
+  if (parent) link(i, byKey.get(keyOf(parent))!);
+});
+
+const data = {
+  nodes: notes.map((n) => ({ t: n.data.title, u: urlOf(n), p: n.collection === 'projects' ? 1 : 0 })),
+  edges,
+};
+---
+
+<Base title="문서 지도" description="위키와 프로젝트 문서가 서로 어떻게 연결되어 있는지 보여주는 지도">
+  <h1>문서 지도</h1>
+  <p class="muted">
+    문서끼리 링크로 이어진 모습을 한눈에 볼 수 있어요. 점을 누르면 그 문서로 이동해요.
+  </p>
+  <p class="legend muted">
+    <span><i class="dot wiki"></i>위키</span>
+    <span><i class="dot project"></i>프로젝트</span>
+    <span>문서 {data.nodes.length}개 · 연결 {data.edges.length}개</span>
+  </p>
+
+  <div class="graph">
+    <canvas id="graph-canvas" aria-label="문서 연결 지도"></canvas>
+    <noscript><p class="empty">문서 지도는 JavaScript가 켜져 있어야 보여요.</p></noscript>
+  </div>
+
+  <script type="application/json" id="graph-data" set:html={JSON.stringify(data)} />
+</Base>
+
+<script>
+  type Node = { t: string; u: string; p: number; x: number; y: number; vx: number; vy: number; deg: number; ph: number };
+
+  const canvas = document.getElementById('graph-canvas') as HTMLCanvasElement | null;
+  const raw = document.getElementById('graph-data')?.textContent;
+  if (canvas && raw) start(canvas, JSON.parse(raw));
+
+  function start(canvas: HTMLCanvasElement, data: { nodes: { t: string; u: string; p: number }[]; edges: [number, number][] }) {
+    const ctx = canvas.getContext('2d')!;
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // ── 점과 선 준비 ──
+    const n = data.nodes.length;
+    const nodes: Node[] = data.nodes.map((d, i) => {
+      const a = i * 2.39996; // 황금각으로 흩어 놓고 시작
+      const r = 12 * Math.sqrt(i + 1);
+      return { ...d, x: Math.cos(a) * r, y: Math.sin(a) * r, vx: 0, vy: 0, deg: 0, ph: i * 1.7 };
+    });
+    const edges = data.edges;
+    const neighbors = nodes.map(() => new Set<number>());
+    for (const [a, b] of edges) {
+      nodes[a].deg++;
+      nodes[b].deg++;
+      neighbors[a].add(b);
+      neighbors[b].add(a);
+    }
+    const radius = (d: Node) => 3.5 + Math.sqrt(d.deg) * 1.6;
+
+    // ── 힘 계산 (서로 밀어내기 + 선은 당기기 + 가운데로 모으기) ──
+    let dragged: Node | null = null;
+    function tick(drift: number, time: number) {
+      for (let i = 0; i < n; i++) {
+        const a = nodes[i];
+        for (let j = i + 1; j < n; j++) {
+          const b = nodes[j];
+          let dx = a.x - b.x;
+          let dy = a.y - b.y;
+          let d2 = dx * dx + dy * dy;
+          if (d2 < 1) { dx = Math.random() - 0.5; dy = Math.random() - 0.5; d2 = 1; }
+          if (d2 > 160000) continue;
+          const f = 1500 / d2;
+          const d = Math.sqrt(d2);
+          a.vx += (dx / d) * f; a.vy += (dy / d) * f;
+          b.vx -= (dx / d) * f; b.vy -= (dy / d) * f;
+        }
+      }
+      for (const [i, j] of edges) {
+        const a = nodes[i];
+        const b = nodes[j];
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        const f = (d - 80) * 0.012;
+        a.vx += (dx / d) * f; a.vy += (dy / d) * f;
+        b.vx -= (dx / d) * f; b.vy -= (dy / d) * f;
+      }
+      // 화면 비율에 맞춰 가운데로 모은다 (세로로 긴 폰 화면에서는 좌우를 더 세게)
+      const ratio = W && H ? W / H : 1.4;
+      const gx = 0.005 * Math.max(1, 1.4 / ratio);
+      const gy = 0.005 * Math.max(1, ratio / 1.4);
+      for (const d of nodes) {
+        d.vx -= d.x * gx;
+        d.vy -= d.y * gy;
+        if (drift) {
+          // 둥둥 떠다니는 느낌: 점마다 박자가 다른 아주 작은 흔들림
+          d.vx += Math.sin(time * 0.0006 + d.ph) * drift;
+          d.vy += Math.cos(time * 0.0005 + d.ph * 1.3) * drift;
+        }
+        if (d === dragged) { d.vx = d.vy = 0; continue; }
+        d.vx *= 0.82;
+        d.vy *= 0.82;
+        const sp = Math.hypot(d.vx, d.vy);
+        if (sp > 12) { d.vx *= 12 / sp; d.vy *= 12 / sp; }
+        d.x += d.vx;
+        d.y += d.vy;
+      }
+    }
+    // ── 화면 크기와 보는 위치 (전체가 들어오게 부드럽게 맞춤) ──
+    let W = 0, H = 0, dpr = 1;
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      dpr = window.devicePixelRatio || 1;
+      W = rect.width; H = rect.height;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+    }
+    new ResizeObserver(resize).observe(canvas);
+    resize();
+    for (let k = 0; k < 400; k++) tick(0, 0); // 처음 모양을 미리 잡아둔다
+
+    const view = { x: 0, y: 0, s: 1 };
+    function fitTarget() {
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const d of nodes) {
+        x0 = Math.min(x0, d.x); x1 = Math.max(x1, d.x);
+        y0 = Math.min(y0, d.y); y1 = Math.max(y1, d.y);
+      }
+      const pad = 60;
+      const s = Math.min((W - pad * 2) / Math.max(x1 - x0, 1), (H - pad * 2) / Math.max(y1 - y0, 1), 1.6);
+      return { x: (x0 + x1) / 2, y: (y0 + y1) / 2, s: Math.max(s, 0.2) };
+    }
+    Object.assign(view, fitTarget());
+    const toScreen = (d: Node) => [(d.x - view.x) * view.s + W / 2, (d.y - view.y) * view.s + H / 2];
+
+    // ── 색은 사이트 테마(다크·라이트)를 따라간다 ──
+    let colors: Record<string, string> = {};
+    function readColors() {
+      const cs = getComputedStyle(document.documentElement);
+      for (const k of ['accent', 'muted', 'border', 'text', 'surface']) colors[k] = cs.getPropertyValue(`--${k}`).trim();
+    }
+    readColors();
+    const fontFamily = getComputedStyle(document.body).fontFamily;
+    new MutationObserver(readColors).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    // ── 마우스·터치 ──
+    let hover: Node | null = null;
+    let down: { x: number; y: number; node: Node | null; moved: boolean } | null = null;
+    function pick(px: number, py: number): Node | null {
+      let best: Node | null = null;
+      let bestD = Infinity;
+      for (const d of nodes) {
+        const [sx, sy] = toScreen(d);
+        const dist = Math.hypot(sx - px, sy - py);
+        if (dist < Math.max(radius(d) * view.s, 6) + 8 && dist < bestD) { best = d; bestD = dist; }
+      }
+      return best;
+    }
+    const local = (e: PointerEvent) => {
+      const r = canvas.getBoundingClientRect();
+      return [e.clientX - r.left, e.clientY - r.top];
+    };
+    canvas.addEventListener('pointerdown', (e) => {
+      const [px, py] = local(e);
+      const node = pick(px, py);
+      down = { x: px, y: py, node, moved: false };
+      if (node) { dragged = node; hover = node; canvas.setPointerCapture(e.pointerId); }
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      const [px, py] = local(e);
+      if (down) {
+        if (Math.hypot(px - down.x, py - down.y) > 4) down.moved = true;
+        if (dragged && down.moved) {
+          dragged.x = (px - W / 2) / view.s + view.x;
+          dragged.y = (py - H / 2) / view.s + view.y;
+        }
+        return;
+      }
+      hover = pick(px, py);
+      canvas.style.cursor = hover ? 'pointer' : 'default';
+    });
+    const release = () => {
+      if (down?.node && !down.moved) location.href = down.node.u;
+      down = null;
+      dragged = null;
+    };
+    canvas.addEventListener('pointerup', release);
+    canvas.addEventListener('pointercancel', () => { down = null; dragged = null; });
+    canvas.addEventListener('pointerleave', () => { if (!down) hover = null; });
+
+    // ── 그리기 ──
+    function draw() {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      const focus = hover ? neighbors[nodes.indexOf(hover)] : null;
+      const hi = hover ? nodes.indexOf(hover) : -1;
+
+      ctx.lineWidth = 1;
+      for (const [i, j] of edges) {
+        const on = hi !== -1 && (i === hi || j === hi);
+        ctx.strokeStyle = on ? colors.accent : colors.muted;
+        ctx.globalAlpha = on ? 0.9 : hover ? 0.08 : 0.3;
+        const [x1, y1] = toScreen(nodes[i]);
+        const [x2, y2] = toScreen(nodes[j]);
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+
+      const pos = nodes.map(toScreen);
+      const rad = nodes.map((d) => Math.max(radius(d) * Math.min(view.s, 1.2), 2.5));
+      nodes.forEach((d, i) => {
+        const [x, y] = pos[i];
+        const lit = !hover || i === hi || focus!.has(i);
+        ctx.globalAlpha = lit ? 1 : 0.15;
+        ctx.fillStyle = i === hi || d.p ? colors.accent : colors.muted;
+        ctx.beginPath();
+        ctx.arc(x, y, i === hi ? rad[i] + 1.5 : rad[i], 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 이름표: 겹치는 이름은 빼고, 연결이 많은 문서부터 보여준다.
+      // 마우스를 올린 문서와 그 이웃은 항상 보인다.
+      ctx.font = `12px ${fontFamily}`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      const placed: number[][] = [];
+      const order = nodes.map((_, i) => i).sort((a, b) => {
+        const pa = a === hi ? 2 : focus?.has(a) ? 1 : 0;
+        const pb = b === hi ? 2 : focus?.has(b) ? 1 : 0;
+        return pb - pa || nodes[b].deg - nodes[a].deg;
+      });
+      for (const i of order) {
+        const d = nodes[i];
+        const lit = !hover || i === hi || focus!.has(i);
+        const must = hover && lit;
+        const text = i === hi || d.t.length <= 18 ? d.t : d.t.slice(0, 17) + '…';
+        const w = ctx.measureText(text).width;
+        const [x, y0] = pos[i];
+        const y = y0 + rad[i] + 4;
+        const box = [x - w / 2 - 2, y - 1, x + w / 2 + 2, y + 15];
+        if (!must && placed.some((b) => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) continue;
+        placed.push(box);
+        ctx.globalAlpha = lit ? (i === hi ? 1 : 0.8) : 0.1;
+        ctx.fillStyle = i === hi ? colors.text : colors.muted;
+        ctx.fillText(text, x, y);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // ── 계속 움직이기 ──
+    function frame(time: number) {
+      tick(reduceMotion ? 0 : 0.035, time);
+      if (!dragged) {
+        const t = fitTarget();
+        view.x += (t.x - view.x) * 0.05;
+        view.y += (t.y - view.y) * 0.05;
+        view.s += (t.s - view.s) * 0.05;
+      }
+      draw();
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+</script>
+
+<style>
+  h1 { margin: 0 0 4px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin: 8px 0 20px; font-size: 0.9rem; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; }
+  .dot.wiki { background: var(--muted); }
+  .dot.project { background: var(--accent); }
+  .graph {
+    position: relative;
+    height: clamp(420px, 72vh, 820px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+  }
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
+  .graph noscript .empty { margin: 24px; }
+</style>

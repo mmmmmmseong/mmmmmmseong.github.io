@@ -14,5 +14,6 @@ export const NAV = [
   { href: '/projects', label: '프로젝트' },
   { href: '/wiki', label: '위키' },
   { href: '/tags', label: '태그' },
+  { href: '/graph', label: '지도' },
   { href: '/about', label: '소개' },
 ];
