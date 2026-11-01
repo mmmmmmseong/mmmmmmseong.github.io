@@ -47,7 +47,7 @@ const data = {
 <Base title="문서 지도" description="위키와 프로젝트 문서가 서로 어떻게 연결되어 있는지 보여주는 지도">
   <h1>문서 지도</h1>
   <p class="muted">
-    문서끼리 링크로 이어진 모습을 한눈에 볼 수 있어요. 점을 누르면 그 문서로 이동하고, 빈 곳을 끌면 지도를 둘러볼 수 있어요. 폰에서는 두 손가락으로 확대·축소할 수 있어요.
+    문서끼리 이어진 모습을 한눈에 볼 수 있어요.
   </p>
   <p class="legend muted">
     <span><i class="dot wiki"></i>위키</span>
@@ -57,6 +57,8 @@ const data = {
 
   <div class="graph">
     <canvas id="graph-canvas" aria-label="문서 연결 지도"></canvas>
+    <!-- 조작 안내: 터치 기기에서만 두 손가락 확대 안내를 덧붙인다 -->
+    <p class="hint" aria-hidden="true">누르기 열기 · 끌기 이동<span class="touch-only"> · 두 손가락 확대</span></p>
     <noscript><p class="empty">문서 지도는 JavaScript가 켜져 있어야 보여요.</p></noscript>
   </div>
 
@@ -412,4 +414,22 @@ const data = {
     touch-action: none;
   }
   .graph noscript .empty { margin: 24px; }
+  .hint {
+    position: absolute;
+    right: 12px;
+    bottom: 10px;
+    margin: 0;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    color: var(--muted);
+    font-size: 0.78rem;
+    opacity: 0.85;
+    pointer-events: none;
+    user-select: none;
+  }
+  .touch-only { display: none; }
+  @media (pointer: coarse) {
+    .touch-only { display: inline; }
+  }
 </style>
