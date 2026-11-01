@@ -1,5 +1,13 @@
 # mmmmmmseong.github.io
 
+> **Copyright (c) 2026 mmmmmmseong. All rights reserved.**
+>
+> This repository and the website built from it are proprietary and maintained exclusively by the repository owner. They are publicly visible for viewing only; no license or right of use is granted.
+>
+> Without the owner's prior written permission, copying, modifying, redistributing, or reusing any part of this repository is prohibited. This includes using it to train, fine-tune, or evaluate AI / machine learning models, and providing it to AI assistants or agents to reproduce, imitate, or re-implement its code, content, or design.
+>
+> See [LICENSE](LICENSE) for the full terms.
+
 개인 위키 겸 프로젝트 포트폴리오. [Astro](https://astro.build)로 만들고 GitHub Pages로 배포합니다.
 
 - 🌗 라이트/다크 테마 전환 (처음엔 시스템 설정을 따르고, 고른 테마는 기억함)
