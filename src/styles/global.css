@@ -191,3 +191,38 @@ a.tag:hover { text-decoration: none; filter: brightness(0.96); }
   border-bottom: 1px dashed currentColor;
   cursor: help;
 }
+
+/* ───────────── 화면 조작 부분은 선택되지 않게 ─────────────
+   메뉴·버튼·태그·카드처럼 누르거나 끄는 곳은 드래그해도 파랗게 선택되지 않는다.
+   본문(.prose), 코드 블록, 제목은 그대로 선택·복사할 수 있다. */
+.site-header,
+.site-footer,
+.btn,
+.tag,
+.tags,
+.badge,
+.meta,
+.kind,
+.crumb,
+.back,
+.eyebrow,
+.section-title,
+.card,
+.wiki-list,
+.connections ul,
+.sidebar,
+.tree,
+.toc,
+.filters,
+.subdocs-head,
+.subdoc > summary,
+.sub-link,
+.pager,
+.legend,
+.graph {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 폰에서 링크·버튼을 누를 때 번쩍이는 파란 네모를 없앤다 (눌림 표시는 각 요소의 색 변화가 대신한다) */
+html { -webkit-tap-highlight-color: transparent; }

@@ -233,6 +233,8 @@ const data = {
     }
 
     canvas.addEventListener('pointerdown', (e) => {
+      // 지도를 끌다가 밖으로 나가도 주변 글자가 선택되지 않게 기본 동작을 막는다
+      e.preventDefault();
       const [px, py] = local(e);
       canvas.setPointerCapture(e.pointerId);
       if (e.pointerType === 'touch') {
