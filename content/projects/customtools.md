@@ -22,7 +22,7 @@ updated: 2026-11-02
 
 | 도구 | 하는 일 | 언어 | 상태 |
 | --- | --- | --- | --- |
-| [[batcreat\|batCreat]] | 명령어를 몰라도 단계를 쌓아서 배치파일(`.bat`)을 만드는 GUI 도구 | Python (Tkinter) | 프로토타입 |
+| [[batcreat\|batCreat]] | 명령어를 몰라도 단계를 쌓아서 배치파일(`.bat`)을 만드는 GUI 도구. 다운로드·압축·이동·조건 분기 지원 | Python (Tkinter) | 프로토타입 |
 
 ## 저장소 구조
 
