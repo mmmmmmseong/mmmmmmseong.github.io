@@ -32,30 +32,42 @@ batCreat은 **"프로그램 열기", "다운로드하기", "폴더 옮기기" �
 - **조건 분기:** "파일이 있으면 / 없으면", "프로그램이 켜져 있으면" 같은 조건과 "아니면" 분기, 중첩까지 지원한다.
 - **다른 PC에서도 동작:** 바탕화면·다운로드 같은 위치는 `%USERPROFILE%\Desktop`처럼 환경변수로 들어간다.
 - **안전한 기본값:** 이미 있는 파일은 건드리지 않고, 실패하면 멈추기를 고를 수 있고, 실행 전에 확인을 받는다.
-- **가벼움:** Python 기본 라이브러리(Tkinter)만 쓰는 파일 하나(`main.py`)다.
+- **가벼움:** Python 기본 라이브러리(Tkinter)만 쓴다. `batCreat` 폴더째 옮기면 어디서든 그대로 실행된다.
 
 ## 화면과 사용 흐름
 
 ```text
 ┌ 파일 메뉴: 새로 만들기 / 열기 / 저장 / 다른 이름으로 저장 / .bat 내보내기 / 끝내기 ┐
-│  순서대로 실행할 단계                                  [+ 단계 추가 ▼]          │
+│  순서대로 실행할 단계            [새로 만들기] [열기] [저장]                     │
+│                                                       [+ 단계 추가 ▼]          │
 │  ┌───────────────────────────────────────────────┐   [ 수정 ] [ 복제 ]         │
 │  │ 1.  프로그램 열기: chrome.exe                  │   [ 삭제 ]                  │
-│  │ 2.  만약 '바탕화면\작업' 폴더가 없으면 (파란색) │   [ ▲ 위로 ] [ ▼ 아래로 ]   │
-│  │ 3.          폴더 만들기: 바탕화면\작업         │                             │
-│  │ 4.  조건 끝                          (파란색) │                             │
+│  │ 2.  ┌ 만약 '작업' 폴더가 없으면                │   [ ▲ 위로 ] [ ▼ 아래로 ]   │
+│  │ 3.  │   폴더 만들기: 작업                      │                             │
+│  │ 4.  └ 끝                                       │                             │
 │  └───────────────────────────────────────────────┘                             │
+│  선택한 단계: 폴더 만들기 — %USERPROFILE%\Desktop\작업                          │
 │  옵션: ☐ 관리자 권한으로 실행  ☑ 진행 상황 표시  ☑ 끝나면 창 유지                │
 │  [코드 보기]                              [바로 실행해보기]  [.bat 저장]        │
 └────────────────────────────────────────────────────────────────────────────────┘
 ```
+
+목록을 한눈에 읽을 수 있도록 표시를 다듬었다.
+
+- **블록 안내선:** 조건 블록은 `┌ 만약`, `├ 아니면`, `└ 끝`으로 짝이 표시되고, 블록 안쪽은 세로선(`│`)으로 이어진다.
+- **종류별 색:** 파일 작업은 초록, 메시지·질문 창은 보라, 배치 끝내기는 빨강, 조건은 파랑, "끝"은 회색이다.
+- **짧은 설명:** 목록에는 경로의 마지막 이름만 보이고, 단계를 고르면 아래 **선택한 단계** 칸에 전체 경로·주소·옵션이 나온다.
+- **블록 강조:** 만약·아니면·끝 줄을 고르면 그 블록 전체가 옅은 파란색으로 칠해진다.
+- **단계 추가 메뉴:** 프로그램 / 열기 / 파일 작업 / 창·흐름 네 묶음으로 구분선을 넣어 정리했다.
 
 1. **+ 단계 추가**에서 할 일을 고른다. 선택한 줄 **바로 아래**에 들어간다.
 2. 뜨는 질문 창에 내용을 채운다.
 3. 목록에서 **▲ 위로 / ▼ 아래로**로 순서를 맞춘다. 더블클릭하면 수정할 수 있다.
 4. **코드 보기**로 만들어질 코드를 확인하고, **바로 실행해보기**로 실제 동작을 확인한다.
 5. **.bat 저장**으로 배치파일을 만든다.
-6. 나중에 고칠 수 있도록 **파일 → 저장**으로 **작업 파일**(`.json`)도 남겨둔다. `.bat`만으로는 다시 편집할 수 없다. ([[json]])
+6. 나중에 고칠 수 있도록 **저장**(`Ctrl+S`)으로 **작업 파일**(`.json`)도 남겨둔다. `.bat`만으로는 다시 편집할 수 없다. ([[json]])
+
+작업 파일은 위쪽 **새로 만들기 / 열기 / 저장** 버튼이나 `Ctrl+N` / `Ctrl+O` / `Ctrl+S`로 다룬다. `python main.py 작업.json`처럼 파일을 넘겨 실행하면 바로 그 파일이 열린다.
 
 창 제목에는 작업 파일 이름이 나오고, 저장하지 않은 변경이 있으면 앞에 `*`가 붙는다.
 
@@ -74,6 +86,8 @@ batCreat은 **"프로그램 열기", "다운로드하기", "폴더 옮기기" �
 | **압축하기 (zip)** | 파일·폴더를 zip으로 묶기 |
 | **압축 풀기 (zip)** | zip을 같은 이름의 폴더 등으로 풀기 |
 | **다운로드하기** | 주소에서 파일 받기. zip이면 받은 뒤 바로 풀기 가능 |
+| **메시지 창 띄우기** | "확인" 버튼 하나짜리 알림 창. 아이콘, 여러 줄 내용, 확인을 누를 때까지 기다리기, 자동으로 닫기 선택 가능 |
+| **질문 창 띄우기** | 예·아니요(또는 확인·취소) 창. 누른 답에 따라 다음 조건 블록에서 흐름을 나눔 |
 | **배치 끝내기** | 여기서 멈추고 남은 단계는 실행하지 않음. 메시지 표시 가능 |
 | **조건 (만약 ~라면)** | 아래 참고 |
 
@@ -98,6 +112,22 @@ batCreat은 **"프로그램 열기", "다운로드하기", "폴더 옮기기" �
 
 공개된 자료만 받을 수 있고, 404 같은 오류는 오류 페이지를 파일로 저장하지 않고 **실패로 처리**한다.
 
+### 질문 창으로 흐름 나누기
+
+질문 창을 추가할 때 "답에 따라 나눌 조건 블록도 만들기"를 켜 두면(기본) 아래 블록이 함께 만들어진다.
+
+```text
+ 1.  질문 창: 설치를 시작할까요? (예 · 아니요)
+ 2.  ┌ 만약 질문 창에서 '예(확인)'를 눌렀으면
+ 3.  │   (예를 눌렀을 때 할 일)
+ 4.  ├ 아니면
+ 5.  │   (아니요를 눌렀을 때 할 일)
+ 6.  └ 끝
+```
+
+- 답을 받을 때까지 다음 단계로 넘어가지 않는다. 시간이 지나 자동으로 닫히면 '아니요'로 처리한다.
+- 답은 **바로 다음 조건**에서 확인해야 한다. 사이에 다른 단계가 끼면 그 단계의 결과로 바뀐다.
+
 ## 조건 (만약 / 아니면 / 끝)
 
 ```text
@@ -113,6 +143,7 @@ batCreat은 **"프로그램 열기", "다운로드하기", "폴더 옮기기" �
 | 파일/폴더가 있으면 / 없으면 | 확인할 대상(**상관없음 · 파일만 · 폴더만**)과 경로 |
 | 프로그램이 켜져 있으면 / 꺼져 있으면 | 프로그램 이름 (실행 중에서 고르기 가능) |
 | 앞 단계가 성공했으면 / 실패했으면 | 없음. 바로 앞 단계의 결과를 봄 |
+| 질문 창에서 '예(확인)' / '아니요(취소)'를 눌렀으면 | 없음. 바로 앞 질문 창의 답을 봄 |
 
 - 고른 조건에 필요한 칸만 나타난다.
 - 조건용 경로 칸은 지금 없는 경로도 넣을 수 있고, 칸 아래에 "지금 이 PC에는 있어요 (폴더)"처럼 현재 상태를 보여준다.
@@ -143,69 +174,124 @@ batCreat은 **"프로그램 열기", "다운로드하기", "폴더 옮기기" �
 | 옵션 | 설명 |
 | --- | --- |
 | 관리자 권한으로 실행 | 관리자 권한이 아니면 UAC 확인 창을 띄워 다시 실행한다. 작업 폴더는 배치파일이 있는 폴더로 맞춘다 |
-| 진행 상황 표시 | `[2/5] 압축하기: ...`처럼 지금 하는 일을 출력한다 |
+| 진행 상황 표시 | 단계마다 시작과 결과를 보여주고, 창 제목에도 현재 단계를 표시한다 (아래 참고) |
 | 끝나면 창 유지 | 마지막에 결과를 볼 수 있게 키 입력을 기다린다 |
+
+### 실행 화면
+
+```text
+[1/4] 다운로드: GitHub 저장소 → 다운로드\MyTool.zip (받은 뒤 압축 풀기)
+      ... 받는 중 (용량이 크면 시간이 걸려요)
+      → 완료
+[2/4] 압축하기: 문서\프로젝트 → D:\백업\프로젝트.zip
+      ... 압축하는 중 (크기에 따라 시간이 걸려요)
+      → 건너뜀 (이미 있어요)
+[3/4] 다운로드: GitHub 저장소 → 다운로드\x.zip
+      ... 받는 중 (용량이 크면 시간이 걸려요)
+      → 실패: 주소를 찾을 수 없거나 공개되지 않은 파일이에요
+```
+
+- **시작과 결과:** 단계마다 `→ 완료` / `→ 건너뜀` / `→ 실패: 이유` 중 하나로 끝난다. 오래 걸리는 단계는 "… 중" 줄을 먼저 보여줘서 멈춘 게 아님을 알려준다.
+- **창 제목:** `[2/4] 압축하기: ...`처럼 현재 단계가 표시되어, 창을 내려놔도 작업표시줄에서 진행 상황을 볼 수 있다. 끝나면 "모든 작업이 끝났어요", 실패로 멈추면 "오류로 멈췄어요"로 바뀐다.
+- **실패했을 때:** 화면에는 "인터넷 연결을 확인해 주세요"처럼 **알기 쉬운 이유**를 보여주고, curl·PowerShell 같은 프로그램이 낸 **오류 원문은 팝업 창**으로 따로 띄운다. 팝업은 배치 진행을 막지 않는다.
+- 진행 상황 표시를 꺼도 실패한 단계는 `[실패] 단계 설명: 이유`로 알려준다.
 
 ## 만들어지는 배치파일
 
 아래 단계를 실제로 변환한 결과다. **코드 보기** 버튼으로 언제든 확인할 수 있다.
 
 ```text
- 1.  만약 '바탕화면\MyTool' 폴더가 있으면
- 2.          배치 끝내기: 이미 설치되어 있어요   (아무 키나 누를 때까지 기다리기)
- 3.  조건 끝
- 4.  다운로드: GitHub 저장소 → 다운로드\MyTool.zip   (받은 뒤 압축 풀기, 실패하면 멈추기)
- 5.  파일/폴더 이동하기: 다운로드\MyTool → 바탕화면   (건너뛰기, 실패하면 멈추기)
+ 1.  질문 창: MyTool을 설치할까요? (예 · 아니요)
+ 2.  ┌ 만약 질문 창에서 '예(확인)'를 눌렀으면
+ 3.  │   다운로드: GitHub 저장소 → 다운로드\MyTool.zip   (받은 뒤 압축 풀기, 실패하면 멈추기)
+ 4.  ├ 아니면
+ 5.  │   메시지 창: 설치를 취소했어요
+ 6.  └ 끝
 ```
 
 ```bat
 @echo off
 
-rem [1] 만약 '바탕화면\MyTool' 폴더가 있으면
-if not exist "%USERPROFILE%\Desktop\MyTool\" goto :if1_end
-
-rem [2] 배치 끝내기 (남은 단계는 실행 안 함): 이미 설치되어 있어요
-echo [1/3] 배치 끝내기 (남은 단계는 실행 안 함): 이미 설치되어 있어요
-echo 이미 설치되어 있어요
-pause
-exit /b 0
-
-rem [3] 조건 끝
-:if1_end
-
-rem [4] 다운로드: GitHub 저장소 → 다운로드\MyTool.zip (받은 뒤 압축 풀기)
-echo [2/3] 다운로드: GitHub 저장소 → 다운로드\MyTool.zip (받은 뒤 압축 풀기)
-"%SystemRoot%\System32\curl.exe" -fL --retry 2 -o "%USERPROFILE%\Downloads\MyTool.zip" "https://github.com/user/MyTool/archive/HEAD.zip" && powershell -NoProfile -Command "$ProgressPreference='SilentlyContinue'; Expand-Archive -LiteralPath '%USERPROFILE%\Downloads\MyTool.zip' -DestinationPath '%USERPROFILE%\Downloads\MyTool' -Force -ErrorAction Stop" || goto :fail
-
-rem [5] 이동: 다운로드\MyTool → 바탕화면\MyTool
-echo [3/3] 이동: 다운로드\MyTool → 바탕화면\MyTool
-if not exist "%USERPROFILE%\Downloads\MyTool" goto :mv5_missing
-if exist "%USERPROFILE%\Desktop\MyTool" goto :mv5_ok
-if not exist "%USERPROFILE%\Downloads\MyTool\" goto :mv5_file
-robocopy "%USERPROFILE%\Downloads\MyTool" "%USERPROFILE%\Desktop\MyTool" /E /MOVE /IS /IT /R:1 /W:1 /NFL /NDL /NJH /NJS /NP >nul
-if errorlevel 8 goto :mv5_fail
-goto :mv5_ok
-:mv5_file
-move /y "%USERPROFILE%\Downloads\MyTool" "%USERPROFILE%\Desktop\MyTool" >nul
-if not errorlevel 1 goto :mv5_ok
-goto :mv5_fail
-:mv5_missing
-echo 옮길 파일/폴더를 찾을 수 없어요: 다운로드\MyTool
-:mv5_fail
+rem [1] 질문 창: MyTool을 설치할까요? (예 · 아니요)
+title [1/3] 질문 창: MyTool을 설치할까요? (예 · 아니요)
+echo [1/3] 질문 창: MyTool을 설치할까요? (예 · 아니요)
+echo       ... 답을 기다리는 중
+(call )
+powershell -NoProfile -Command "$r = (New-Object -ComObject WScript.Shell).Popup('MyTool을 설치할까요?', 0, '설치', 69668); if ($r -eq 1 -or $r -eq 6) { exit 0 } else { exit 1 }"
+if errorlevel 1 goto :s1_no
+echo       → '예' 버튼을 눌렀어요
+goto :s1_end
+:s1_no
+echo       → '아니요' 버튼을 눌렀어요
 cmd /c exit 1
+:s1_end
+
+rem [2] 만약 질문 창에서 '예(확인)'를 눌렀으면
+if errorlevel 1 goto :if2_else
+
+rem [3] 다운로드: GitHub 저장소 → 다운로드\MyTool.zip (받은 뒤 압축 풀기)
+title [2/3] 다운로드: GitHub 저장소 → 다운로드\MyTool.zip (받은 뒤 압축 풀기)
+echo [2/3] 다운로드: GitHub 저장소 → 다운로드\MyTool.zip (받은 뒤 압축 풀기)
+echo       ... 받는 중 (용량이 크면 시간이 걸려요)
+if exist "%TEMP%\batcreat_s3.err" del "%TEMP%\batcreat_s3.err"
+(call )
+if not exist "%USERPROFILE%\Downloads\MyTool.zip\" goto :s3_notdir
+set "BC_REASON=저장 위치가 폴더예요. 폴더 뒤에 파일 이름까지 넣어 주세요 (예: 폴더\파일.zip)"
+goto :s3_fail
+:s3_notdir
+"%SystemRoot%\System32\curl.exe" -fsSL --retry 2 -o "%USERPROFILE%\Downloads\MyTool.zip" "https://github.com/user/MyTool/archive/HEAD.zip" 2>"%TEMP%\batcreat_s3.err"
+set "BC_CODE=%errorlevel%"
+if "%BC_CODE%"=="0" goto :s3_got
+set "BC_REASON=다운로드하지 못했어요 (curl 오류 %BC_CODE%)"
+if "%BC_CODE%"=="6" set "BC_REASON=인터넷 연결을 확인해 주세요 (서버 주소를 찾을 수 없어요)"
+if "%BC_CODE%"=="7" set "BC_REASON=서버에 연결할 수 없어요 (인터넷 연결을 확인해 주세요)"
+if "%BC_CODE%"=="22" set "BC_REASON=주소를 찾을 수 없거나 공개되지 않은 파일이에요"
+if "%BC_CODE%"=="23" set "BC_REASON=저장 위치에 쓸 수 없어요 (파일이 열려 있거나 권한이 없어요)"
+if "%BC_CODE%"=="28" set "BC_REASON=시간이 너무 오래 걸려서 중단됐어요"
+if "%BC_CODE%"=="35" set "BC_REASON=보안 연결에 실패했어요"
+if "%BC_CODE%"=="60" set "BC_REASON=보안 인증서를 확인할 수 없어요"
+goto :s3_fail
+:s3_got
+powershell -NoProfile -Command "$ProgressPreference='SilentlyContinue'; Expand-Archive -LiteralPath '%USERPROFILE%\Downloads\MyTool.zip' -DestinationPath '%USERPROFILE%\Downloads\MyTool' -Force -ErrorAction Stop" 2>"%TEMP%\batcreat_s3.err"
+if not errorlevel 1 goto :s3_ok
+set "BC_REASON=받은 파일의 압축을 풀지 못했어요 (zip 파일이 아닐 수 있어요)"
+goto :s3_fail
+:s3_ok
+(call )
+echo       → 완료
+goto :s3_end
+:s3_fail
+echo       → 실패: %BC_REASON%
+if exist "%TEMP%\batcreat_s3.err" for %%A in ("%TEMP%\batcreat_s3.err") do if %%~zA GTR 0 start "" powershell -NoProfile -WindowStyle Hidden -Command "$t = Get-Content -LiteralPath (Join-Path $env:TEMP 'batcreat_s3.err') -Raw; (New-Object -ComObject WScript.Shell).Popup($t, 0, '오류 원문 - 3번째 줄 (다운로드하기)', 69648) | Out-Null"
 goto :fail
-goto :mv5_end
-:mv5_ok
-cmd /c exit 0
-:mv5_end
+cmd /c exit 1
+:s3_end
+
+rem [4] 아니면 (조건이 안 맞을 때)
+goto :if2_end
+:if2_else
+
+rem [5] 메시지 창: 설치를 취소했어요
+title [3/3] 메시지 창: 설치를 취소했어요
+echo [3/3] 메시지 창: 설치를 취소했어요
+(call )
+start "" powershell -NoProfile -WindowStyle Hidden -Command "(New-Object -ComObject WScript.Shell).Popup('설치를 취소했어요', 0, '알림', 69696) | Out-Null"
+(call )
+echo       → 완료
+
+rem [6] 조건 끝
+:if2_end
 
 goto :end
 :fail
+title 오류로 멈췄어요
 echo.
 echo 오류가 발생해서 작업을 멈췄습니다.
 pause
 exit /b 1
 :end
+
+title 모든 작업이 끝났어요
 
 echo.
 echo 모든 작업이 끝났습니다.
@@ -223,13 +309,23 @@ pause
 | --- | --- |
 | `%`가 변수로 해석됨 (URL의 `%20` 등) | `%%`로 바꿔서 넣는다. 단, `%USERPROFILE%` 같은 위치 바로가기는 그대로 살린다 |
 | `start "경로"`가 프로그램이 아니라 **창 제목**으로 읽힘 | 항상 `start ""`로 빈 제목을 먼저 넣는다 |
-| 경로에 `(1)` 같은 **괄호**가 있으면 괄호 블록이 깨짐 | 조건을 괄호 블록 대신 **`goto` 라벨**로 만든다. 이동처럼 내부에 분기가 필요한 단계는 단계 번호로 라벨을 구분한다(`:mv5_ok`) |
+| 경로에 `(1)` 같은 **괄호**가 있으면 괄호 블록이 깨짐 | 조건을 괄호 블록 대신 **`goto` 라벨**로 만든다. 이동처럼 내부에 분기가 필요한 단계는 단계 번호로 라벨을 구분한다(`:s3_fail`, `:s3_end`) |
 | `echo`로 `&`, `<`, `>` 같은 기호를 출력하면 명령으로 실행됨 | 앞에 `^`를 붙여 이스케이프한다 |
-| PATH에 Git의 리눅스용 `find`, 다른 `curl`이 먼저 잡힘 | `%SystemRoot%\System32\` 전체 경로로 Windows 기본 도구를 부른다 |
+| PATH에 Git의 리눅스용 `find`, `timeout`이나 다른 `curl`이 먼저 잡힘 | `%SystemRoot%\System32\` 전체 경로로 Windows 기본 도구를 부른다 |
+| 앞 단계의 결과 코드가 다음 단계 판단에 섞임 | 단계마다 시작할 때 `(call )`로 결과 코드를 0으로 맞추고, 성공·실패를 분명히 남긴다 |
 | `move`는 **다른 드라이브로 폴더를** 옮기지 못함 | 폴더는 `robocopy /MOVE`, 파일은 `move`로 옮긴다. 파일인지 폴더인지는 **실행할 때** 확인한다(앞 단계에서 받은 것일 수도 있어서) |
-| `robocopy`는 성공해도 결과 코드가 1~7 | 8 이상만 실패로 보고, 끝나면 `cmd /c exit 0`으로 성공 상태로 맞춘다. 그래야 다음 "앞 단계가 성공했으면" 조건이 제대로 동작한다 |
-| `curl`은 404여도 오류 페이지를 파일로 저장함 | `-f`로 실패 처리하고, `&&`로 다운로드가 성공했을 때만 압축을 푼다 |
+| `robocopy`는 성공해도 결과 코드가 1~7 | 8 이상만 실패로 보고, 나머지는 성공 상태로 맞춘다. 그래야 다음 "앞 단계가 성공했으면" 조건이 제대로 동작한다 |
+| `curl`은 404여도 오류 페이지를 파일로 저장함 | `-f`로 실패 처리하고, 다운로드가 성공했을 때만 압축을 푼다. curl의 종료 코드(6, 7, 22, 28 등)는 "인터넷 연결을 확인해 주세요" 같은 쉬운 문장으로 바꿔 보여준다 |
 | PowerShell의 압축 진행률 표시가 느림 | `$ProgressPreference='SilentlyContinue'`로 끈다 |
+
+### 메시지·질문 창
+
+창은 PowerShell에서 `WScript.Shell`의 `Popup`을 불러 띄운다.
+
+- `msg.exe`는 Windows Home에 없고, `mshta`(VBScript)는 단계적으로 제거되는 중이라 쓰지 않았다.
+- 앞 창을 닫은 직후 띄운 팝업이 다른 창 뒤에 숨는 경우가 있어서, **맨 위에 표시 + 앞으로 가져오기** 옵션을 함께 준다.
+- 질문 창은 누른 버튼을 결과 코드(예 = 0, 아니요 = 1)로 남기고, 바로 다음 조건이 이 값을 본다.
+- 배치와 같은 콘솔에서 기다리며 실행하는 PowerShell에 `-WindowStyle Hidden`을 주면 **배치 창까지 숨겨져서** 쓰지 않는다. 기다릴 필요 없는 팝업만 `start`로 따로 띄운다.
 
 ### 한글 인코딩
 
@@ -243,6 +339,24 @@ pause
 - `show_when`: 다른 칸의 값에 따라 보이거나 숨는다. (예: 조건이 "파일/폴더"일 때만 경로 칸)
 - `add_only`: 추가할 때만 보이고 수정 창에서는 숨는다.
 - `browse_sets`: 찾아보기에서 파일/폴더를 고르면 다른 칸(파일만/폴더만)을 자동으로 맞춘다.
+
+### 역할별 모듈
+
+처음에는 `main.py` 한 파일이었지만, 기능이 늘어 역할별 파일로 나눴다. 위 파일만 아래 파일을 가져다 쓰는 **한 방향 구조**다.
+
+| 파일 | 내용 |
+| --- | --- |
+| `main.py` | 실행 진입점 |
+| `app.py` | 메인 창: 목록 조작, 작업 파일 저장·열기, .bat 내보내기, 바로 실행 |
+| `dialog.py` | 질문 창: 필드 정의로 자동 생성 |
+| `widgets.py` | 경로 입력 칸, 실행 중 프로그램 고르기 |
+| `script.py` | 배치 전체 조립, 진행 표시·실패 처리, 인코딩 |
+| `steps.py` | 단계 정의 `STEP_TYPES`, 메뉴 묶음, 목록 색, 조건 블록 짝 맞추기 |
+| `actions.py` | 단계별 코드 생성·설명 함수, 실패 처리 도우미, 조건 코드, 팝업 |
+| `urls.py` | 다운로드 주소 판별과 변환 |
+| `paths.py` | 위치 바로가기, 배치용·화면용 경로, 이스케이프 |
+
+진행 표시, 결과 줄, 창 제목, "실패하면 멈추기"는 `script.py`가 **모든 단계 앞뒤에 자동으로** 붙인다. 각 단계의 코드는 자기 일만 하면 된다.
 
 ## 활용 예시
 
@@ -280,4 +394,4 @@ pause
 - Python 3 (3.13에서 확인), Tkinter (표준 라이브러리, 추가 설치 없음)
 - 대상: Windows 10 (1803 이상) / Windows 11
 - 만들어진 배치파일은 Windows 기본 도구만 쓴다: `curl.exe`(다운로드), PowerShell 5.1(압축), `robocopy`, `tasklist`, `find`, `taskkill`
-- 파일 하나(`main.py`)로 동작
+- 역할별 파일 9개 (`main.py`로 실행, 폴더째 옮기면 그대로 동작)
