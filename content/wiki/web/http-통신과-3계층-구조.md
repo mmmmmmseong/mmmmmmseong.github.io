@@ -1,6 +1,6 @@
 ---
-title: HTTP 통신과 3계층 구조
-description: 클라이언트·서버·데이터베이스로 나누는 3계층 구조와, 그 사이에서 요청과 응답을 주고받는 HTTP
+title: 3계층 구조와 요청 URL
+description: 클라이언트·서버·데이터베이스로 나누는 3계층 구조와, 요청 URL과 쿼리를 도서관에 비유한 설명
 tags: [웹]
 created: 2026-08-22
 updated: 2026-11-01
