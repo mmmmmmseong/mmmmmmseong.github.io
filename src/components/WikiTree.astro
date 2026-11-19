@@ -5,16 +5,20 @@ import { countEntries, urlOf } from '../lib/content';
 interface Props {
   node: TreeNode;
   current?: string; // 현재 보고 있는 문서 URL
+  depth?: number; // 트리 깊이 (최상위 분류 = 0)
 }
 
-const { node, current } = Astro.props;
+const { node, current, depth = 0 } = Astro.props;
+// 위키 첫 화면: 최상위 분류만 펼친다. 문서 페이지: 지금 문서가 들어 있는 폴더만 펼친다.
+const isOpen = (path: string) =>
+  current ? current === `/wiki/${path}` || current.startsWith(`/wiki/${path}/`) : depth === 0;
 ---
 
 <ul class="tree">
   {
     node.children.map((child) => (
       <li>
-        <details open={!current || current === `/wiki/${child.path}` || current.startsWith(`/wiki/${child.path}/`) || undefined}>
+        <details open={isOpen(child.path) || undefined}>
           <summary>
             {child.page ? (
               <a class="page" href={urlOf(child.page)} aria-current={urlOf(child.page) === current ? 'page' : undefined}>
@@ -25,7 +29,7 @@ const { node, current } = Astro.props;
             )}
             <span class="count">{countEntries(child)}</span>
           </summary>
-          <Astro.self node={child} current={current} />
+          <Astro.self node={child} current={current} depth={depth + 1} />
         </details>
       </li>
     ))
