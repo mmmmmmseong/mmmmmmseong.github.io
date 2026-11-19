@@ -1,0 +1,104 @@
+---
+// 하위 문서가 있는 프로젝트의 문서 목록 (상위 프로젝트 + 하위 문서).
+// 넓은 화면에서는 왼쪽 사이드바, 좁은 화면에서는 제목 위의 접이식 상자로 쓴다.
+import type { Project } from '../lib/content';
+import { urlOf } from '../lib/content';
+
+interface Props {
+  root: Project;
+  docs: Project[]; // root의 하위 문서 (순서대로)
+  current: string; // 지금 보고 있는 문서 URL
+  variant: 'sidebar' | 'mobile';
+}
+
+const { root, docs, current, variant } = Astro.props;
+const here = (p: Project) => (urlOf(p) === current ? 'page' : undefined);
+const currentDoc = [root, ...docs].find((p) => urlOf(p) === current);
+---
+
+{
+  variant === 'sidebar' ? (
+    <nav class="project-nav sidebar" aria-label="프로젝트 문서 목록">
+      <a class="all" href="/projects">← 프로젝트</a>
+      <a class="root" href={urlOf(root)} aria-current={here(root)}>
+        {root.data.title}
+      </a>
+      <ul>
+        {docs.map((d) => (
+          <li>
+            <a href={urlOf(d)} aria-current={here(d)}>
+              {d.data.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  ) : (
+    <details class="project-nav mobile">
+      <summary>
+        <span class="label">문서 목록</span>
+        <span class="now">{currentDoc?.data.title}</span>
+        <span class="count">{docs.length + 1}</span>
+      </summary>
+      <a class="all" href="/projects">← 프로젝트</a>
+      <a class="root" href={urlOf(root)} aria-current={here(root)}>
+        {root.data.title}
+      </a>
+      <ul>
+        {docs.map((d) => (
+          <li>
+            <a href={urlOf(d)} aria-current={here(d)}>
+              {d.data.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </details>
+  )
+}
+
+<style>
+  .project-nav { font-size: 0.93rem; }
+  .project-nav a {
+    display: block;
+    padding: 4px 6px;
+    border-radius: 6px;
+    color: var(--muted);
+  }
+  .project-nav a:hover { color: var(--text); background: var(--surface-2); text-decoration: none; }
+  .project-nav a[aria-current='page'] { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+  .project-nav .all { margin-bottom: 12px; padding: 0; font-size: 0.9rem; }
+  .project-nav .all:hover { background: none; }
+  .project-nav .root { color: var(--text); font-weight: 600; }
+  .project-nav ul { margin: 2px 0 0 10px; padding: 0 0 0 10px; list-style: none; border-left: 1px solid var(--border); }
+
+  .mobile {
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .mobile > summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    list-style: none;
+  }
+  .mobile > summary::-webkit-details-marker { display: none; }
+  .mobile > summary::before {
+    content: '▸';
+    color: var(--muted);
+    font-size: 0.8em;
+    transition: transform 0.15s ease;
+  }
+  .mobile[open] > summary::before { transform: rotate(90deg); }
+  .mobile .label { font-weight: 700; white-space: nowrap; }
+  .mobile .now { flex: 1; min-width: 0; overflow: hidden; color: var(--muted); text-overflow: ellipsis; white-space: nowrap; }
+  .mobile .count { color: var(--muted); font-size: 0.78rem; }
+  .mobile[open] .now { visibility: hidden; }
+  .mobile > :not(summary) { margin-left: 14px; margin-right: 14px; }
+  .mobile > .all { margin-top: 2px; }
+  .mobile > ul { margin-bottom: 12px; }
+</style>

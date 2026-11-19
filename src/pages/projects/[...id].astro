@@ -4,6 +4,7 @@ import Base from '../../layouts/Base.astro';
 import Connections from '../../components/Connections.astro';
 import SubDocs from '../../components/SubDocs.astro';
 import DocPager from '../../components/DocPager.astro';
+import ProjectNav from '../../components/ProjectNav.astro';
 import {
   childrenOf,
   connections,
@@ -13,6 +14,7 @@ import {
   parentOf,
   prepareSubDocs,
   siblingsOf,
+  subDocToc,
   urlOf,
   type Project,
 } from '../../lib/content';
@@ -24,7 +26,7 @@ export async function getStaticPaths() {
 }
 
 const { project } = Astro.props as { project: Project };
-const { Content } = await render(project);
+const { Content, headings } = await render(project);
 const { title, summary, period, role, stack, tags, github, demo, thumbnail } = project.data;
 const all = await getAllProjects();
 const related = connections(project, [...(await getWiki()), ...all]);
@@ -34,17 +36,28 @@ const subs = prepareSubDocs(childrenOf(project, all)); // 상위 프로젝트라
 const parent = parentOf(project, all); // 하위 문서라면: 상위 프로젝트와 이전·다음 문서
 const { prev, next } = siblingsOf(project, all);
 const hasFacts = Boolean(period || role || stack.length);
+
+// 하위 문서가 있는 프로젝트는 위키처럼 왼쪽에 문서 목록을 둔다 (상위·하위 문서 모두).
+const root = parent ?? project;
+const family = childrenOf(root, all);
+const hasNav = family.length > 0;
+const current = urlOf(project);
+const toc = [...headings.filter((h) => h.depth >= 2 && h.depth <= 3), ...subDocToc(subs)];
+const hasToc = toc.length > 1;
 ---
 
 <Base title={title} description={summary}>
+  <div class:list={['layout', { 'has-nav': hasNav, 'has-toc': hasToc }]}>
+  {hasNav && <aside class="side"><ProjectNav root={root} docs={family} current={current} variant="sidebar" /></aside>}
   <article>
+    {hasNav && <div class="mobile-only"><ProjectNav root={root} docs={family} current={current} variant="mobile" /></div>}
     {
       parent ? (
         <a class="back parent-link" href={urlOf(parent)}>
           ↑ {parent.data.title}
         </a>
       ) : (
-        <a class="back" href="/projects">
+        <a class:list={['back', { 'no-nav-only': hasNav }]} href="/projects">
           ← 프로젝트
         </a>
       )
@@ -130,10 +143,54 @@ const hasFacts = Boolean(period || role || stack.length);
 
     <Connections items={related} />
   </article>
+
+  {
+    hasToc && (
+      <nav class="toc" aria-label="목차">
+        <p>목차</p>
+        <ul>
+          {toc.map((h) => (
+            <li class={`d${h.depth}`}>
+              <a href={`#${h.slug}`}>{h.text}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )
+  }
+  </div>
 </Base>
 
 <style>
-  article { max-width: 780px; margin: 0 auto; }
+  /* 기본: 본문 한 단(780px). 하위 문서가 있으면 왼쪽 문서 목록, 목차가 있으면 오른쪽 목차를 붙인다. */
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; align-items: start; max-width: 780px; margin: 0 auto; }
+  .layout.has-toc { grid-template-columns: minmax(0, 1fr) 200px; max-width: 1020px; }
+  .layout.has-nav { grid-template-columns: 220px minmax(0, 1fr); max-width: none; }
+  .layout.has-nav.has-toc { grid-template-columns: 220px minmax(0, 1fr) 200px; }
+  article { min-width: 0; }
+  .side, .toc { position: sticky; top: 84px; max-height: calc(100vh - 110px); overflow-y: auto; }
+  .mobile-only { display: none; }
+  /* 넓은 화면에서는 사이드바에 "← 프로젝트"가 있으므로 본문 위 링크를 숨긴다 */
+  .has-nav .no-nav-only { display: none; }
+
+  .toc p { margin: 0 0 8px; color: var(--muted); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em; }
+  .toc ul { margin: 0; padding: 0 0 0 12px; list-style: none; border-left: 1px solid var(--border); font-size: 0.86rem; }
+  .toc li { padding: 3px 0; }
+  .toc .d3 { padding-left: 12px; }
+  .toc a { color: var(--muted); }
+  .toc a:hover { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 1100px) {
+    .toc { display: none; }
+    .layout.has-toc { grid-template-columns: minmax(0, 1fr); max-width: 780px; }
+    .layout.has-nav, .layout.has-nav.has-toc { grid-template-columns: 220px minmax(0, 1fr); max-width: none; }
+  }
+  @media (max-width: 820px) {
+    .layout.has-nav, .layout.has-nav.has-toc { grid-template-columns: minmax(0, 1fr); }
+    .side { display: none; }
+    .mobile-only { display: block; }
+    .has-nav .no-nav-only { display: none; }
+  }
   .back { color: var(--muted); font-size: 0.9rem; }
   .parent-link { color: var(--accent); font-weight: 600; }
   .sub-count { margin: 10px 0 0; color: var(--muted); font-size: 0.88rem; }
