@@ -6,6 +6,7 @@ role: 개인 프로젝트 (기획·데이터 분석·설계, AI와 협업 구현
 stack: [Flutter, Dart, NEIS Open API, Supabase, PostgreSQL, shared_preferences]
 tags: [앱, 학교]
 github: https://github.com/mmmmmmseong/schoolhelper
+thumbnail: /attachments/schoolhelper-timetable.jpg
 featured: true
 order: 40
 updated: 2026-11-20
