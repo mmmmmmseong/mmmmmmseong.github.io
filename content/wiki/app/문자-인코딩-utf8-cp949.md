@@ -6,7 +6,7 @@ created: 2026-10-29
 updated: 2026-10-29
 ---
 
-> 관련 프로젝트: [[schoolhelper|School Helper: 컴시간 시간표 앱]] · [GitHub](https://github.com/mmmmmmseong/schoolhelper)
+> 관련 프로젝트: [[schoolhelper|스쿨헬퍼]] ([[schoolhelper-legacy|첫 버전: 컴시간 역공학]]) · [GitHub](https://github.com/mmmmmmseong/schoolhelper)
 
 ## 인코딩이란
 
@@ -28,6 +28,8 @@ CP949는 EUC-KR을 포함하므로, 오래된 한국 서비스의 응답은 대�
 ## 겪었던 문제: 컴시간 응답
 
 컴시간 서버는 상황에 따라 UTF-8 또는 CP949로 응답했다. 그래서 **먼저 UTF-8로 읽어보고, 실패하면 CP949로** 읽게 했다.
+
+> 스쿨헬퍼 첫 버전의 이야기다. 지금은 UTF-8 JSON을 주는 NEIS 공식 API로 바꿔서 CP949 처리는 뺐다.
 
 ```dart
 import 'dart:convert';
