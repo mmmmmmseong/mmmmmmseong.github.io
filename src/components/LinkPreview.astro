@@ -1,0 +1,69 @@
+---
+// 본문의 [[위키링크]]에 마우스를 올리면 그 문서의 한 줄 설명(data-desc)을 말풍선으로 보여준다.
+// 마우스가 있는 기기(PC)에서만 동작한다. 터치 기기에서는 아무것도 하지 않는다.
+---
+
+<div class="link-preview" role="tooltip" hidden></div>
+
+<script>
+  const tip = document.querySelector<HTMLDivElement>('.link-preview');
+  const canHover = window.matchMedia('(hover: hover) and (pointer: fine)');
+
+  if (tip) {
+    let timer: number | undefined;
+    let current: HTMLElement | null = null;
+
+    const hide = () => {
+      window.clearTimeout(timer);
+      current = null;
+      tip.hidden = true;
+    };
+
+    const show = (link: HTMLElement) => {
+      tip.textContent = link.dataset.desc ?? '';
+      tip.hidden = false;
+      // 링크 바로 아래에 띄우고, 화면 밖으로 나가면 안쪽으로 당기거나 링크 위로 올린다.
+      const r = link.getBoundingClientRect();
+      const gap = 8;
+      const margin = 12;
+      const { width, height } = tip.getBoundingClientRect();
+      let left = Math.min(r.left, window.innerWidth - width - margin);
+      left = Math.max(margin, left);
+      let top = r.bottom + gap;
+      if (top + height > window.innerHeight - margin) top = r.top - height - gap;
+      tip.style.left = `${left}px`;
+      tip.style.top = `${top}px`;
+    };
+
+    document.addEventListener('mouseover', (e) => {
+      if (!canHover.matches) return;
+      const link = (e.target as Element).closest<HTMLElement>('a.wikilink[data-desc]');
+      if (link === current) return;
+      hide();
+      if (!link) return;
+      current = link;
+      timer = window.setTimeout(() => show(link), 250);
+    });
+    document.addEventListener('scroll', hide, { passive: true });
+    window.addEventListener('blur', hide);
+  }
+</script>
+
+<style>
+  .link-preview {
+    position: fixed;
+    z-index: 60;
+    max-width: 320px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: 0 4px 16px rgb(16 24 40 / 0.12);
+    color: var(--text);
+    font-size: 0.84rem;
+    line-height: 1.55;
+    pointer-events: none;
+  }
+  .link-preview[hidden] { display: none; }
+  :global(:root[data-theme='dark']) .link-preview { box-shadow: 0 4px 16px rgb(0 0 0 / 0.45); }
+</style>

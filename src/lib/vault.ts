@@ -93,7 +93,7 @@ async function walk(dir: string, rel = ''): Promise<string[]> {
 }
 
 interface VaultIndex {
-  notes: Map<string, { url: string; title: string }>; // noteKey → 문서 URL, 제목
+  notes: Map<string, { url: string; title: string; desc: string }>; // noteKey → 문서 URL, 제목, 한 줄 설명
   attachments: Map<string, string>; // 파일 이름 → /attachments/... URL
 }
 
@@ -105,13 +105,17 @@ async function buildIndex(): Promise<VaultIndex> {
       if (!rel.toLowerCase().endsWith('.md')) continue;
       const id = toId(rel);
       let title = path.basename(rel, path.extname(rel));
+      let desc = '';
       try {
         const { data } = splitFrontmatter(await fs.readFile(path.join(dir, rel), 'utf-8'));
         if (typeof data.title === 'string' && data.title) title = data.title;
+        // 링크에 마우스를 올리면 보여줄 한 줄 설명 (위키: description, 프로젝트: summary)
+        const d = data.description ?? data.summary;
+        if (typeof d === 'string') desc = d.trim();
       } catch {
         // 속성(frontmatter)이 깨진 문서는 파일 이름을 제목으로 쓴다.
       }
-      notes.set(noteKey(id), { url: prefix + id, title });
+      notes.set(noteKey(id), { url: prefix + id, title, desc });
     }
   }
   const attachments = new Map<string, string>();
@@ -154,7 +158,8 @@ function transformBody(body: string, index: VaultIndex): string {
         }
         if (!note) return `<span class="wikilink wikilink-missing" title="아직 작성되지 않은 문서">${escapeHtml(label)}</span>`;
         const anchor = hash && hash.length > 1 ? '#' + headingSlug(hash.slice(1)) : '';
-        return `<a class="wikilink" href="${note.url}${anchor}">${escapeHtml(label)}</a>`;
+        const desc = note.desc ? ` data-desc="${escapeHtml(note.desc)}"` : '';
+        return `<a class="wikilink" href="${note.url}${anchor}"${desc}>${escapeHtml(label)}</a>`;
       })
       // 일반 마크다운 이미지 중 attachments 폴더를 가리키는 상대 경로도 사이트 URL로 맞춘다.
       .replace(/(!\[[^\]]*\]\()(?:\.{0,2}\/)*attachments\/([^)\s]+)/g, (_all, head: string, rel: string) => head + attachmentUrl(decodeURI(rel)))

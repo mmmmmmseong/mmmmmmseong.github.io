@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import ThemeToggle from '../components/ThemeToggle.astro';
+import LinkPreview from '../components/LinkPreview.astro';
 import { SITE, NAV } from '../site.config';
 
 interface Props {
@@ -84,6 +85,7 @@ const canonical = new URL(path, Astro.site);
         </span>
       </div>
     </footer>
+    <LinkPreview />
   </body>
 </html>
 
