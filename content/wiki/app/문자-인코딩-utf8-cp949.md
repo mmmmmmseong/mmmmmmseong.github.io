@@ -6,7 +6,7 @@ created: 2026-10-29
 updated: 2026-10-29
 ---
 
-> 관련 프로젝트: [[schoolhelper|스쿨헬퍼]] ([[schoolhelper-legacy|첫 버전: 컴시간 역공학]]) · [GitHub](https://github.com/mmmmmmseong/schoolhelper)
+> 관련 프로젝트: [[schoolhelper|스쿨헬퍼]] ([[schoolhelper-v1|v1: 컴시간 역공학]]) · [GitHub](https://github.com/mmmmmmseong/schoolhelper)
 
 ## 인코딩이란
 
