@@ -6,7 +6,7 @@ role: 개인 프로젝트 (기획·데이터 분석·설계, AI와 협업 구현
 stack: [Flutter, Dart, NEIS Open API, Supabase, PostgreSQL, ML Kit, shared_preferences]
 tags: [앱, 학교]
 github: https://github.com/mmmmmmseong/schoolhelper
-thumbnail: /attachments/schoolhelper-timetable.jpg
+thumbnail: /attachments/schoolhelper-timetable-v3.jpg
 featured: true
 order: 40
 updated: 2026-11-21
@@ -24,6 +24,10 @@ updated: 2026-11-21
 | **임원 공지 작성** | 반 임원은 아이디로 로그인해 자기 반 공지를 쓰고 고친다 |
 | **간단한 시작** | 처음 한 번 학년·반만 고르면 다음부터 바로 내 시간표가 뜬다. 받아 둔 시간표는 인터넷이 끊겨도 볼 수 있다 |
 | **내 안내문** (작업 중) | 안내문 사진을 찍으면 글자를 읽어 정리한다 (Android, 개인용) |
+
+![[schoolhelper-v3-화면.jpg]]
+
+왼쪽은 2학년 3반 시간표다. 연한 파랑 칸이 선택과목 블록으로, 위에 블록 문자, 아래에 내가 고른 과목이 나온다. 오른쪽은 메뉴로, 내 선택과목을 4개 블록 중 4개 골랐다는 표시(4/4)가 보인다.
 
 - 코드: Dart 약 2,600줄, 테스트 7개
 - [[앱-개발-과정#앱-id|앱 ID]] `com.schoolhelper.main`, 갤럭시 S22 울트라 [[앱-개발-과정#실제-폰으로-테스트하기|실기기]]로 테스트
@@ -165,6 +169,10 @@ v1에서는 공지 테이블의 [[rls와-접근-제어|RLS]]가 꺼져 있어서
 ## 내 안내문 (작업 중)
 
 학교 안내문을 사진으로 찍으면 **ML Kit 한국어 문자 인식(OCR)**으로 글자를 읽고, 종류·제목·마감일을 추정해 정리하는 기능이다. Android 전용, 개인용으로 만들고 있다.
+
+![[schoolhelper-ocr.jpg]]
+
+왼쪽은 깨끗하게 만든 시험용 이미지, 오른쪽은 책상 위에서 찍은 실제 가정통신문이다. 파란 상자가 인식한 글자 덩어리(블록)이고, 아래에 블록마다 읽은 글자와 위치, 신뢰도가 나온다. 실제 사진은 신뢰도가 0.54~0.74로 시험용 이미지(0.83~0.84)보다 낮다.
 
 - 지금은 사진 촬영·선택과 글자 인식까지 된다.
 - 사진 보정 방식을 비교해 보니 원본만으로 문자 오류율 2.6%였고, 흑백·대비 보정은 오히려 나빠져서 넣지 않기로 했다.
