@@ -17,6 +17,7 @@ export const SECTIONS = {
 } as const;
 export type Section = keyof typeof SECTIONS;
 
+const TRANSFORM_VERSION = 2;
 const IMAGE_EXT = /\.(png|jpe?g|gif|webp|avif|svg)$/i;
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/;
 const CODE = /(```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]*`)/;
@@ -147,6 +148,10 @@ export function resolveAsset(value: string, index: VaultIndex): string {
 function transformBody(body: string, index: VaultIndex): string {
   return mapOutsideCode(body, (text) =>
     text
+      // 범위를 뜻하는 물결표(0.83~0.84) 두 개가 한 문단에 있으면 그 사이가 취소선이 된다.
+      // Astro 7의 마크다운 변환기(satteri)에는 이를 끄는 설정이 없으므로, 단독 ~ 를 \~ 로 바꿔 글자 그대로 보이게 한다.
+      // ~~두 개~~ 취소선은 그대로 동작한다 (Obsidian과 같은 동작).
+      .replace(/(?<!~)~(?!~)/g, '\\~')
       .replace(WIKILINK, (_all, bang: string, target: string, hash: string | undefined, alias: string | undefined) => {
         const note = index.notes.get(noteKey(target));
         const label = (alias ?? note?.title ?? target.split('/').pop() ?? target).trim();
@@ -178,7 +183,8 @@ export function vaultLoader(section: Section): Loader {
       const sync = async () => {
         const index = await buildIndex();
         // 다른 문서의 제목/주소가 바뀌면 링크도 다시 그려야 하므로, 전체 목록을 digest 에 함께 넣는다.
-        const indexDigest = generateDigest(JSON.stringify([[...index.notes], [...index.attachments]]));
+        // 변환 규칙(transformBody)을 바꾸면 TRANSFORM_VERSION 을 올린다. 그래야 캐시된 문서도 다시 그린다.
+        const indexDigest = generateDigest(JSON.stringify([TRANSFORM_VERSION, [...index.notes], [...index.attachments]]));
         const seen = new Set<string>();
         for (const rel of await walk(dir)) {
           if (!rel.toLowerCase().endsWith('.md')) continue;
