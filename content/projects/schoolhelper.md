@@ -2,7 +2,7 @@
 title: "스쿨헬퍼: 인천남동고 학교 정보 앱"
 summary: 흩어진 학교 정보를 한곳에 모은 Flutter 앱. NEIS 시간표·학사일정·급식, 내 선택과목, 학급 공지, 직접 학습한 모델로 안내문 제목을 찾는 OCR
 period: "2026.10 – 진행 중"
-role: 개인 프로젝트 (기획·데이터 분석·설계, AI와 협업 구현)
+role: 학교 소모임 프로젝트 (기획·데이터 분석·설계, AI와 협업 구현)
 stack: [Flutter, Dart, NEIS Open API, Supabase, PostgreSQL, ML Kit, scikit-learn, shared_preferences]
 tags: [앱, 학교]
 github: https://github.com/mmmmmmseong/schoolhelper
